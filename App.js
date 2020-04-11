@@ -1,114 +1,143 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
+import React, { Component } from 'react';
 import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
+  Platform, StyleSheet, Text, View,
+  Button, Alert,
+  ActivityIndicator,
 } from 'react-native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import GetLocation from 'react-native-get-location';
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
-
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+const instructions = Platform.select({
+  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
+  android:
+    'Double tap R on your keyboard to reload,\n' +
+    'Shake or press menu button for dev menu',
 });
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+  location: {
+    color: '#333333',
+    marginBottom: 5,
+  },
+  button: {
+    marginBottom: 8,
+  }
+});
+
+export default class App extends Component {
+  
+  state = {
+    location: null,
+    loading: false,
+  }
+  
+  _requestLocation = () => {
+    this.setState({ loading: true, location: null });
+    
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 150000,
+    })
+      .then(location => {
+        this.setState({
+          location,
+          loading: false,
+        });
+      })
+      .catch(ex => {
+        const { code, message } = ex;
+        console.warn(code, message);
+        if (code === 'CANCELLED') {
+          Alert.alert('Location cancelled by user or by another request');
+        }
+        if (code === 'UNAVAILABLE') {
+          Alert.alert('Location service is disabled or unavailable');
+        }
+        if (code === 'TIMEOUT') {
+          Alert.alert('Location request timed out');
+        }
+        if (code === 'UNAUTHORIZED') {
+          Alert.alert('Authorization denied');
+        }
+        this.setState({
+          location: null,
+          loading: false,
+        });
+      });
+  }
+  
+  render() {
+    const { location, loading } = this.state;
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>Welcome to React Native!</Text>
+        <Text style={styles.instructions}>To get location, press the button:</Text>
+        <View style={styles.button}>
+          <Button
+            disabled={loading}
+            title="Get Location"
+            onPress={this._requestLocation}
+          />
+        </View>
+        {loading ? (
+          <ActivityIndicator />
+        ) : null}
+        {location ? (
+          <Text style={styles.location}>
+            {JSON.stringify(location, 0, 2)}
+          </Text>
+        ) : null}
+        <Text style={styles.instructions}>Extra functions:</Text>
+        <View style={styles.button}>
+          <Button
+            title="Open App Settings"
+            onPress={() => {
+              GetLocation.openAppSettings();
+            }}
+          />
+        </View>
+        <View style={styles.button}>
+          <Button
+            title="Open Gps Settings"
+            onPress={() => {
+              GetLocation.openGpsSettings();
+            }}
+          />
+        </View>
+        <View style={styles.button}>
+          <Button
+            title="Open Wifi Settings"
+            onPress={() => {
+              GetLocation.openWifiSettings();
+            }}
+          />
+        </View>
+        <View style={styles.button}>
+          <Button
+            title="Open Mobile Data Settings"
+            onPress={() => {
+              GetLocation.openCelularSettings();
+            }}
+          />
+        </View>
+        <Text style={styles.instructions}>{instructions}</Text>
+      </View>
+    );
+  }
+}
