@@ -4,6 +4,7 @@ import {
   Button, Alert,
   ActivityIndicator,
 } from 'react-native';
+import axios from 'axios';
 
 import GetLocation from 'react-native-get-location';
 
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
 export default class App extends Component {
   
   state = {
-    location: null,
+    tempRead: null,
     loading: false,
   }
   
@@ -55,10 +56,18 @@ export default class App extends Component {
       timeout: 150000,
     })
       .then(location => {
-        this.setState({
-          location,
-          loading: false,
-        });
+        let long = location['longitude'].toFixed(2);
+        let lat = location['latitude'].toFixed(2);
+        let url = `https://api.weather.gov/points/${lat},${long}`;
+        axios.get(url).then(data => {
+          let forecastUrl = data['data']['properties']['forecast'];
+          axios.get(forecastUrl).then(dataFc => {
+            this.setState({
+              tempRead: dataFc['data']['properties']['periods'],
+              loading: false,
+            });
+          })
+        })
       })
       .catch(ex => {
         const { code, message } = ex;
@@ -83,60 +92,32 @@ export default class App extends Component {
   }
   
   render() {
-    const { location, loading } = this.state;
+    const { tempRead, loading } = this.state;
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get location, press the button:</Text>
+        {/*<Text style={styles.welcome}>Welcome to React Native!</Text>*/}
+        {/*<Text style={styles.instructions}>To get 7 days temps, press the button:</Text>*/}
         <View style={styles.button}>
           <Button
             disabled={loading}
-            title="Get Location"
+            title="Get Temperatures"
             onPress={this._requestLocation}
           />
         </View>
         {loading ? (
           <ActivityIndicator />
         ) : null}
-        {location ? (
-          <Text style={styles.location}>
-            {JSON.stringify(location, 0, 2)}
-          </Text>
+        {tempRead ? (
+          tempRead.map((p, i, a) => {
+            return (
+              <View key={i}>
+              <Text style={styles.location}>
+                {`${p['name']} ${p['temperature']}`}
+              </Text>
+            </View>)
+          })
         ) : null}
-        <Text style={styles.instructions}>Extra functions:</Text>
-        <View style={styles.button}>
-          <Button
-            title="Open App Settings"
-            onPress={() => {
-              GetLocation.openAppSettings();
-            }}
-          />
-        </View>
-        <View style={styles.button}>
-          <Button
-            title="Open Gps Settings"
-            onPress={() => {
-              GetLocation.openGpsSettings();
-            }}
-          />
-        </View>
-        <View style={styles.button}>
-          <Button
-            title="Open Wifi Settings"
-            onPress={() => {
-              GetLocation.openWifiSettings();
-            }}
-          />
-        </View>
-        <View style={styles.button}>
-          <Button
-            title="Open Mobile Data Settings"
-            onPress={() => {
-              GetLocation.openCelularSettings();
-            }}
-          />
-        </View>
-        <Text style={styles.instructions}>{instructions}</Text>
+        {/*<Text style={styles.instructions}>Extra functions:</Text>*/}
       </View>
     );
   }
