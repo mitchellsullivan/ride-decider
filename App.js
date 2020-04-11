@@ -12,14 +12,15 @@ import {
   ScrollView,
   FlatList,
   KeyboardAvoidingView,
-  Keyboard
+  Keyboard,
 } from 'react-native';
+import {
+  AsyncStorage
+} from '@react-native-community/async-storage';
 import axios from 'axios';
 import GetLocation from 'react-native-get-location';
 import { byPoints, forecastJackson } from './data/forecast';
 
-// const TEMPS = Array.from(new Array(251), (x,i) => i + -100)
-const LOC_TEST = "32.36,-90.136"
 const DEFAULT_LOC = {
   longitude : byPoints.data.geometry.coordinates[0],
   latitude : byPoints.data.geometry.coordinates[1]
@@ -27,13 +28,14 @@ const DEFAULT_LOC = {
 
 export default class App extends Component {
   state = {
-    periods: null,
+    periods: [],
     loading: false,
     seldHi: '72',
     seldLo: '60',
   }
   
-  componentDidMount(): void {
+  async componentDidMount(): void {
+    await this._retrieveTempRange();
     this._requestLocation();
   }
   
@@ -67,20 +69,6 @@ export default class App extends Component {
         .catch(ex => {
           const { code, message } = ex;
           // console.warn(code, message);
-          // if (code === 'CANCELLED') {
-          //   Alert.alert('Location cancelled by user or by another request');
-          // }
-          // if (code === 'UNAVAILABLE') {
-          //   Alert.alert('Location service is disabled or unavailable');
-          //   // console.log(byPoints);
-          //
-          // }
-          // if (code === 'TIMEOUT') {
-          //   Alert.alert('Location request timed out');
-          // }
-          // if (code === 'UNAUTHORIZED') {
-          //   Alert.alert('Authorization denied');
-          // }
           location = DEFAULT_LOC;
           this.populate(location);
           this.setState({
@@ -102,6 +90,28 @@ export default class App extends Component {
       })
     }
   }
+  
+  _retrieveTempRange = async () => {
+    try {
+      let seldLo = await AsyncStorage.getItem('lo') || '60';
+      let seldHi = await AsyncStorage.getItem('hi') || '72';
+      this.setState({
+        seldLo,
+        seldHi
+      })
+    } catch (error) {
+    
+    }
+  }
+  
+  _saveTempRange = async () => {
+    try {
+      await AsyncStorage.setItem('lo', this.state.seldLo || '60');
+      await AsyncStorage.setItem('hi', this.state.seldHi || '72');
+    } catch (error) {
+      // Error saving data
+    }
+  };
   
   renderItem(item) {
     // const color = item.good ? 'lightgreen' : '#fff';
@@ -129,21 +139,31 @@ export default class App extends Component {
     const { periods, loading, seldLo, seldHi } = this.state;
     let days = periods
     return (
-      <KeyboardAvoidingView style={styles.container} behavior='padding'>
+      <KeyboardAvoidingView style={styles.container}
+                            behavior='padding'>
         <View style={styles.topSpace}/>
         <View style={[styles.headingView, {flexDirection: 'row'}]}>
-          <View style={{flex: 0.33}}/>
+          <View style={{flex: 0.33}}>
+            <View style={styles.buttView}>
+              <TouchableOpacity onPress={this._requestLocation} disabled={loading}>
+                <View style={styles.butt}>
+                  <Text style={styles.buttText}>Refresh</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
           <View style={{flex: 0.33}}>
             <Text style={styles.headingText}>
               RiDecide
             </Text>
           </View>
           <View style={{flex: 0.33}}>
-            {loading ? <ActivityIndicator/> : null}
+            {loading ?
+              <ActivityIndicator style={{paddingBottom: 10, height: 40}}/> : null}
           </View>
         </View>
         {!days || days.length === 0 ? (
-          <View style={{flex: 0.7, backgroundColor: 'lightgray', width: 350}}>
+          <View style={{flex: 0.75, backgroundColor: 'lightgray', width: 350}}>
             <Text style={{textAlign: 'center', fontSize: 20, marginTop: 30}}>
               (No data.)
             </Text>
@@ -158,31 +178,31 @@ export default class App extends Component {
             />
           </View>
         )}
-        <View style={styles.buttView}>
-          <TouchableOpacity onPress={this._requestLocation} disabled={loading}>
-            <View style={styles.butt}>
-              <Text style={styles.buttText}>Refresh</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
         <View style={styles.boxView}>
-          <Text>  Lowest Temp / Highest Temp</Text>
           <View style={{flexDirection:"row"}}>
-            <View style={{flex:1}}>
+            <View style={{flex: 1}}>
+              <Text>Lo Good Temp (F)</Text>
               <TextInput keyboardType='numeric'
                          returnKeyLabel='Done'
                          returnKeyType='done'
-                         onSubmitEditing={Keyboard.dismiss}
+                         onSubmitEditing={async () => {
+                           Keyboard.dismiss();
+                           await this._saveTempRange();
+                         }}
                          onChangeText={(text) => this.onChangeTemp(text, 'lo')}
                          value={seldLo ? seldLo : ''}
                          style={[styles.tempBox, {justifyContent: 'flex-start'}]}
                          maxLength={3}/>
             </View>
-            <View style={{flex:1}}>
+            <View style={{flex: 1}}>
+              <Text>Hi Good Temp (F)</Text>
               <TextInput keyboardType='numeric'
                          returnKeyLabel='Done'
                          returnKeyType='done'
-                         onSubmitEditing={Keyboard.dismiss}
+                         onSubmitEditing={async () => {
+                           Keyboard.dismiss();
+                           await this._saveTempRange();
+                         }}
                          onChangeText={text => this.onChangeTemp(text, 'hi')}
                          value={seldHi ? seldHi : ''}
                          style={[styles.tempBox, {justifyContent: 'flex-end'}]}
@@ -206,7 +226,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   headingView: {
-    padding: 10,
+    paddingTop: 10,
   },
   headingText: {
     fontSize: 28,
@@ -242,17 +262,18 @@ const styles = StyleSheet.create({
   //   flex: 0.25
   // },
   butt: {
-    height: 50,
-    padding: 5,
+    height: 40,
+    paddingTop: 10,
+    paddingRight: 10
+    // borderWidth: 1,
   },
   buttText: {
     color: 'blue',
-    fontSize: 20
+    fontSize: 18,
+    textAlign: 'center'
   },
   buttView: {
-    flex: 0.05,
-    marginTop: 10,
-    marginBottom: 10
+    // backgroundColor: 'lightgray',
   },
   boxView: {
     flex: 0.25,
@@ -261,7 +282,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   listView: {
-    flex: 0.7,
+    flex: 0.75,
     width: 350
   },
   scroll: {
@@ -274,7 +295,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1
   },
   row: {
-    height: 50,
+    height: 60,
     // borderRadius: 5,
     marginTop: 0,
     borderColor: 'gray',
