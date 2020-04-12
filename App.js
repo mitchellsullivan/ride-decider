@@ -1,37 +1,96 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react'
 import {
-  Platform,
+  ActivityIndicator,
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
   StyleSheet,
   Text,
-  View,
-  Button,
-  Alert,
-  ActivityIndicator,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  FlatList,
-  KeyboardAvoidingView,
-  Keyboard,
-} from 'react-native';
-import {
-  AsyncStorage
-} from '@react-native-community/async-storage';
-import axios from 'axios';
-import GetLocation from 'react-native-get-location';
-import { byPoints, forecastJackson } from './data/forecast';
+  View,
+} from 'react-native'
+import {AsyncStorage} from '@react-native-community/async-storage'
+import axios from 'axios'
+import GetLocation from 'react-native-get-location'
+import {byPoints} from './data/forecast'
 
 const DEFAULT_LOC = {
   longitude : byPoints.data.geometry.coordinates[0],
   latitude : byPoints.data.geometry.coordinates[1]
 }
 
+const DEFAULT_HI = '72';
+const DEFAULT_LO = '60';
+
+class WeatherPeriod {
+  idx: number;
+  name: string;
+  tempUnit: string;
+  temp: number;
+  hiWind: number;
+  loWind: number;
+  windString: string;
+  isRainy: boolean;
+  wasYesterdayRainy: boolean;
+  shortForecast: string = '';
+  
+  constructor(pData) {
+    this.idx = String(pData['number']);
+    this.name = pData['name'];
+    this.temp = parseFloat(pData['temperature']);
+    this.windString = pData['windSpeed'];
+    let winds = this.windString.replace('mph', '')
+      .split(' to ');
+    this.loWind = parseFloat(winds[0]);
+    this.hiWind = winds.length < 2 ? this.loWind : parseFloat(winds[1]);
+    this.shortForecast = pData['shortForecast'];
+    this.tempUnit = pData['temperatureUnit'];
+    let lfc = this.shortForecast.toLowerCase();
+    this.isRainy = lfc.includes('shower') ||
+      lfc.includes('rain') ||
+      lfc.includes('storm');
+  }
+  
+  getDisplayString() {
+    return `${this.name}, ${this.temp}\u00B0${this.tempUnit}, ` +
+      `${this.loWind}` +
+      `${this.hiWind === this.loWind ? '' : ' to ' + this.hiWind}` +
+      `\n${this.shortForecast}`;
+  }
+}
+
+class Criterium {
+  maxGoodTemp: number = parseFloat(DEFAULT_HI);
+  minGoodTemp: number = parseFloat(DEFAULT_LO);
+  
+  constructor(minGoodTemp, maxGoodTemp) {
+    this.maxGoodTemp = parseFloat(maxGoodTemp);
+    this.minGoodTemp = parseFloat(minGoodTemp);
+  }
+  
+  isMet(period: WeatherPeriod) {
+    return this.isTempOkay(period.temp);
+  }
+  
+  getTempRating(period: WeatherPeriod): number {
+    const tooHot = period.temp > this.maxGoodTemp;
+    const tooCold = period.temp < this.minGoodTemp;
+    if (!tooHot && !tooCold) {
+      return 0;
+    } if (tooHot) {
+      return 1;
+    } else {
+      return -1;
+    }
+  }
+}
+
 export default class App extends Component {
   state = {
     periods: [],
     loading: false,
-    seldHi: '72',
-    seldLo: '60',
+    criteria: new Criterium(DEFAULT_LO, DEFAULT_HI)
   }
   
   async componentDidMount(): void {
@@ -50,6 +109,7 @@ export default class App extends Component {
       axios.get(forecastUrl).then(dataFc => {
         let periods = dataFc['data']['properties']['periods'];
         periods = periods.filter(p => !p['name'].toLowerCase().endsWith('night'));
+        periods = periods.map(p => new WeatherPeriod(p));
         this.setState({
           periods,
           loading: false,
@@ -59,7 +119,11 @@ export default class App extends Component {
   }
   
   _requestLocation = () => {
-    this.setState({ loading: true, location: null, periods: [] });
+    this.setState({
+      loading: true,
+      location: null,
+      periods: []
+    });
     setTimeout(() => {
       GetLocation.getCurrentPosition({
         enableHighAccuracy: false,
@@ -68,7 +132,6 @@ export default class App extends Component {
         .then(location => this.populate(location))
         .catch(ex => {
           const { code, message } = ex;
-          // console.warn(code, message);
           location = DEFAULT_LOC;
           this.populate(location);
           this.setState({
@@ -81,23 +144,27 @@ export default class App extends Component {
   
   onChangeTemp = (t, which) => {
     if (which === 'hi') {
+      let criteria = this.state.criteria;
+      criteria.maxGoodTemp = t;
       this.setState({
-        seldHi: t
+        criteria
       })
     } else {
+      let criteria = this.state.criteria;
+      criteria.minGoodTemp = t;
       this.setState({
-        seldLo: t
+        criteria
       })
     }
   }
   
   _retrieveTempRange = async () => {
     try {
-      let seldLo = await AsyncStorage.getItem('lo') || '60';
-      let seldHi = await AsyncStorage.getItem('hi') || '72';
+      let lo = await AsyncStorage.getItem('lo') || DEFAULT_LO;
+      let hi = await AsyncStorage.getItem('hi') || DEFAULT_HI;
+      let criteria = new Criterium(lo, hi);
       this.setState({
-        seldLo,
-        seldHi
+        criteria
       })
     } catch (error) {
     
@@ -106,29 +173,27 @@ export default class App extends Component {
   
   _saveTempRange = async () => {
     try {
-      await AsyncStorage.setItem('lo', this.state.seldLo || '60');
-      await AsyncStorage.setItem('hi', this.state.seldHi || '72');
+      await AsyncStorage.setItem('lo', this.state.criteria.minGoodTemp);
+      await AsyncStorage.setItem('hi', this.state.criteria.maxGoodTemp);
     } catch (error) {
       // Error saving data
     }
   };
   
-  renderItem(item) {
-    // const color = item.good ? 'lightgreen' : '#fff';
-    const temp = item['temperature'];
-    const tooHot = temp > parseFloat(this.state.seldHi);
-    const tooCold = temp < parseFloat(this.state.seldLo);
-    const isGood = !tooHot && !tooCold;
-    const color = isGood ? 'lightgreen' : tooHot ? 'salmon' : 'lightblue';
+  renderItem(item: WeatherPeriod) {
+    const rate = this.state.criteria.getTempRating(item);
+    let color = 'white'
+    switch (rate) {
+      case -1: color = 'lightblue'; break;
+      case  0: color = 'lightgreen'; break;
+      case  1: color = 'salmon'; break;
+    }
+    // const color = isGood ? 'lightgreen' : tooHot ? 'salmon' : 'lightblue';
     return (
-      <TouchableOpacity onPress={() => alert('yo')}>
+      <TouchableOpacity onPress={() => alert(item.name)}>
         <View style={[styles.row, {backgroundColor: color}]}>
           <Text style={styles.textDeviceName}>
-            {`${item['name']} - `}
-            {`${temp} ${item['temperatureUnit']} - `}
-            {`${item['windSpeed']} ${item['windDirection']} ... `}
-            {`${isGood ? 'Y' : 'N'}`}
-            {`\n${item['shortForecast']}`}
+            {item.getDisplayString()}
           </Text>
         </View>
       </TouchableOpacity>
@@ -136,7 +201,7 @@ export default class App extends Component {
   }
   
   render() {
-    const { periods, loading, seldLo, seldHi } = this.state;
+    const { periods, loading, criteria } = this.state;
     let days = periods
     return (
       <KeyboardAvoidingView style={styles.container}
@@ -174,7 +239,7 @@ export default class App extends Component {
               style={styles.scroll}
               data={days}
               renderItem={({item}) => this.renderItem(item)}
-              keyExtractor={item => item['number'].toString()}
+              keyExtractor={item => item.idx}
             />
           </View>
         )}
@@ -190,7 +255,7 @@ export default class App extends Component {
                            await this._saveTempRange();
                          }}
                          onChangeText={(text) => this.onChangeTemp(text, 'lo')}
-                         value={seldLo ? seldLo : ''}
+                         value={String(criteria.minGoodTemp)}
                          style={[styles.tempBox, {justifyContent: 'flex-start'}]}
                          maxLength={3}/>
             </View>
@@ -204,7 +269,7 @@ export default class App extends Component {
                            await this._saveTempRange();
                          }}
                          onChangeText={text => this.onChangeTemp(text, 'hi')}
-                         value={seldHi ? seldHi : ''}
+                         value={String(criteria.maxGoodTemp)}
                          style={[styles.tempBox, {justifyContent: 'flex-end'}]}
                          maxLength={3}/>
             </View>
