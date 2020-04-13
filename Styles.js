@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
   },
   topSpace: {
     marginTop: 40,
@@ -14,7 +14,8 @@ export const styles = StyleSheet.create({
     paddingTop: 10,
   },
   headingText: {
-    fontSize: 28,
+    fontSize: 24,
+    paddingTop: 5,
     textAlign: 'center'
   },
   tempBox: {
@@ -22,7 +23,7 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: 'lightgray',
-    height: 50,
+    height: 40,
     padding: 5,
     margin: 5,
     fontSize: 24,
@@ -73,16 +74,16 @@ export const styles = StyleSheet.create({
     width: 350
   },
   scroll: {
-    backgroundColor: 'lightgray',
+    // backgroundColor: 'lightgray',
     // margin: 10,
     // marginTop: 10,
     // borderWidth: 1,
     // borderRadius: 10,
     borderColor: 'lightgray',
-    // borderWidth: 1
+    borderWidth: 1
   },
   row: {
-    height: 60,
+    height: 50,
     // borderRadius: 5,
     marginTop: 0,
     borderColor: 'gray',
