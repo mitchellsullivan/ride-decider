@@ -78,7 +78,7 @@ export const styles = StyleSheet.create({
     // margin: 10,
     // marginTop: 10,
     // borderWidth: 1,
-    // borderRadius: 10,
+    borderRadius: 5,
     borderColor: 'lightgray',
     borderWidth: 1
   },
@@ -86,8 +86,8 @@ export const styles = StyleSheet.create({
     height: 50,
     // borderRadius: 5,
     marginTop: 0,
-    borderColor: 'gray',
-    borderBottomWidth: 1,
+    borderColor: 'black',
+    borderBottomWidth: 0.5,
     padding: 5,
   },
 });
