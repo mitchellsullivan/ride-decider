@@ -19,14 +19,14 @@ export const styles = StyleSheet.create({
     textAlign: 'center'
   },
   tempBox: {
-    width: 90,
+    width: 70,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: 'lightgray',
     height: 40,
     padding: 5,
     margin: 5,
-    fontSize: 24,
+    fontSize: 18,
     textAlign: 'center',
     color: 'black'
   },
@@ -89,5 +89,6 @@ export const styles = StyleSheet.create({
     borderColor: 'black',
     borderBottomWidth: 0.5,
     padding: 5,
+    flexDirection: 'row'
   },
 });

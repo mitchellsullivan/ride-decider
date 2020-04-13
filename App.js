@@ -1,8 +1,10 @@
 import React from 'react';
+
 import {
   AsyncStorage,
   StatusBar,
 } from 'react-native'
+
 import {
   createAppContainer
 } from 'react-navigation';
@@ -15,17 +17,25 @@ import {
   createBottomTabNavigator,
 } from 'react-navigation-tabs';
 
+import {
+  Criteria,
+  DEFAULT_HI,
+  DEFAULT_LO,
+  DEFAULT_LOC,
+  WeatherPeriod
+} from './Components/models';
+
 import HomeScreen from './Components/Screens/HomeScreen';
 import IconWithBadge from './Components/IconWithBadge';
-import CriteriaScreen from './Components/Screens/CriteriaScreen'
-import {Criterium, DEFAULT_HI, DEFAULT_LO, DEFAULT_LOC, WeatherPeriod} from './Components/models'
-import axios from 'axios'
-import GetLocation from 'react-native-get-location'
+import criteriaListcreen from './Components/Screens/CriteriaScreen';
+import axios from 'axios';
+import GetLocation from 'react-native-get-location';
+import Uuid from 'react-native-uuid';
 
 const TabStack = createBottomTabNavigator(
   {
     Home: HomeScreen,
-    Criteria: CriteriaScreen
+    Criteria: criteriaListcreen
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
@@ -71,80 +81,82 @@ const AppContainer = createAppContainer(MainStack);
 
 export default class App extends React.Component {
   state = {
-    criteria: new Criterium(),
+    currCriteria: new Criteria(),
+    criteriaList: [],
     periods: [],
     loading: false
   }
   
-  async componentDidMount(): void {
-    let stored = await this._retrieveCriteria();
-    // alert(JSON.stringify(stored));
-    let criteria = new Criterium(stored.minGoodTemp,
-      stored.maxGoodTemp,
-      stored.prevDayRainOkay,
-      stored.rainOkay);
-    this.setState({
-      criteria
-    });
-    await this._requestLocation();
+  toClass = (obj, proto) => {
+    obj.__proto__ = proto;
+    return obj;
   }
   
-  _retrieveCriteria = async () => {
+  async componentDidMount(): void {
+    let stored = await this.loadSavedState();
+    let periods = (stored.periods || [])
+      .map(v => this.toClass(v, WeatherPeriod.prototype));
+    let criteriaList = (stored.criteriaList || [])
+      .map(v => this.toClass(v, Criteria.prototype));
+    let currCriteria = Object.assign(
+      new Criteria,
+      stored.currCriteria);
+    this.setState({
+      periods,
+      currCriteria,
+      criteriaList
+    });
+    setTimeout(async () => await this.requestLocation(), 3000);
+  }
+  
+  loadSavedState = async () => {
     let ret = {
-      minGoodTemp: parseFloat(DEFAULT_LO),
-      maxGoodTemp: parseFloat(DEFAULT_HI),
-      prevDayRainOkay: true,
-      rainOkay: false
+      currCriteria: new Criteria(),
+      criteriaList: [],
+      periods: [],
+      loading: false
     }
     try {
-      let stored = await AsyncStorage.getItem('crit');
-      if (stored) {
-        ret = JSON.parse(stored);
-      }
+      ret.currCriteria = JSON.parse(
+        await AsyncStorage.getItem('curr')) || ret.currCriteria;
+      ret.currCriteria.uuid = Uuid.v1();
+      ret.periods = JSON.parse(
+        await AsyncStorage.getItem('periods')) || ret.periods;
+      ret.criteriaList = JSON.parse(
+        await AsyncStorage.getItem('criteriaList')) || ret.criteriaList;
     } catch (error) {
     }
+    // alert(JSON.stringify(ret));
     return ret;
   }
   
-  _saveCriteria = async () => {
-    let criteria = this.state.criteria;
-    criteria.minGoodTemp = parseFloat(criteria.minGoodTemp || DEFAULT_LO);
-    criteria.maxGoodTemp = parseFloat(criteria.maxGoodTemp || DEFAULT_HI);
-    if (criteria.maxGoodTemp < criteria.minGoodTemp) {
-      // alert(`yup ${JSON.stringify(criteria)}`)
-      let swap = criteria.minGoodTemp;
-      criteria.minGoodTemp = criteria.maxGoodTemp;
-      criteria.maxGoodTemp = swap;
-    }
+  saveState = async () => {
     try {
-      await AsyncStorage.setItem('crit', JSON.stringify({
-        minGoodTemp: criteria.minGoodTemp,
-        maxGoodTemp: criteria.maxGoodTemp,
-        prevDayRainOkay: criteria.prevDayRainOkay,
-        rainOkay: criteria.rainOkay
-      }));
+      await AsyncStorage.setItem(
+        'curr', JSON.stringify(this.state.currCriteria));
+      await AsyncStorage.setItem(
+        'periods', JSON.stringify(this.state.periods));
+      await AsyncStorage.setItem(
+        'criteriaList', JSON.stringify(this.state.criteriaList));
     } catch (error) {
-      // Error saving data
     }
-    this.setState({
-      criteria,
-    });
   };
   
   onChangeTemp = (t, which) => {
-    let criteria = this.state.criteria;
+    let currCriteria = this.state.currCriteria;
     if (which === 'hi') {
-      criteria.maxGoodTemp = t;
-    } else {
-      criteria.minGoodTemp = t;
+      currCriteria.maxGoodTemp = t;
+    } else if (which === 'lo') {
+      currCriteria.minGoodTemp = t;
+    } else if (which === 'mw') {
+      currCriteria.maxWind = t;
     }
     this.setState({
-      criteria
+      currCriteria
     })
   }
   
   populate = async (location) => {
-    alert(JSON.stringify(location));
     location = location || DEFAULT_LOC;
     let long = (location['longitude'] || 0).toFixed(1);
     let lat = (location['latitude'] || 0).toFixed(1);
@@ -160,6 +172,9 @@ export default class App extends React.Component {
         a[i + 1].wasYesterdayRainy = true;
       }
     })
+    if (periods.length === 0) {
+      periods = this.state.periods
+    }
     this.setState({
       location,
       periods,
@@ -167,11 +182,40 @@ export default class App extends React.Component {
     });
   }
   
-  _requestLocation = async () => {
+  addCriteria = async () => {
+    let cc = this.state.currCriteria;
+    let min = parseFloat(cc.minGoodTemp || DEFAULT_LO);
+    let max = parseFloat(cc.maxGoodTemp || DEFAULT_HI);
+    if (min > max) {
+      cc.minGoodTemp = max;
+      cc.maxGoodTemp = min;
+    }
+    cc.maxWind = parseFloat(cc.maxWind);
+    let criteriaList = [...this.state.criteriaList, cc];
+    let next = new Criteria(cc.minGoodTemp,
+      cc.maxGoodTemp,
+      cc.rainOkay,
+      cc.prevDayRainOkay,
+      cc.maxWind);
+    this.setState({
+      criteriaList,
+      currCriteria: next
+    })
+    await this.saveState();
+  }
+  
+  delCriteria = (uuid) => {
+    let criteriaList = this.state.criteriaList
+      .filter(v => v.uuid !== uuid);
+    this.setState({
+      criteriaList
+    });
+  }
+  
+  requestLocation = async () => {
     this.setState({
       loading: true,
-      location: null,
-      periods: []
+      location: null
     });
     let location = null;
     try {
@@ -187,19 +231,35 @@ export default class App extends React.Component {
     await this.populate(location);
   }
   
+  onChangeRain = (which) => {
+    let curr = this.state.currCriteria;
+    if (which === 'curr') {
+      curr.rainOkay = !curr.rainOkay;
+    } else if (which === 'prev') {
+      curr.prevDayRainOkay = !curr.prevDayRainOkay;
+    }
+    this.setState({
+      currCriteria: curr,
+    })
+  }
+  
   render() {
     return (
       <>
         <StatusBar barStyle='dark-content' />
         <AppContainer
           screenProps={{
-            saveCriteria: this._saveCriteria,
-            retrieveCriteria: this._retrieveCriteria,
+            saveState: this.saveState,
+            loadSavedState: this.loadSavedState,
             onChangeTemp: this.onChangeTemp,
-            criteria: this.state.criteria,
+            onChangeRain: this.onChangeRain,
+            curr: this.state.currCriteria,
+            criteriaList: this.state.criteriaList,
+            addCriteria: this.addCriteria,
             periods: this.state.periods,
             loading: this.state.loading,
-            requestLocation: this._requestLocation
+            requestLocation: this.requestLocation,
+            delCriteria: this.delCriteria
           }}/>
       </>
     )

@@ -1,3 +1,5 @@
+import Uuid from 'react-native-uuid';
+
 import {byPoints} from '../data/forecast'
 
 export const DEFAULT_HI = '72';
@@ -8,20 +10,19 @@ export const DEFAULT_LOC = {
   latitude : byPoints.data.geometry.coordinates[1]
 }
 
-export class Criterium {
-  maxGoodTemp: number;
-  minGoodTemp: number;
-  rainOkay: boolean;
-  prevDayRainOkay: boolean;
-  
+export class Criteria {
   constructor(minGoodTemp: number = parseFloat(DEFAULT_LO),
               maxGoodTemp: number = parseFloat(DEFAULT_HI),
               rainOkay: boolean = false,
-              prevDayRainOkay: boolean = true) {
+              prevDayRainOkay: boolean = true,
+              maxWind: number = 50,
+              uuid: string = Uuid.v1()) {
     this.minGoodTemp = minGoodTemp;
     this.maxGoodTemp = maxGoodTemp;
     this.rainOkay = rainOkay;
     this.prevDayRainOkay = prevDayRainOkay;
+    this.maxWind = maxWind;
+    this.uuid = uuid;
   }
   
   compTemperature(period: WeatherPeriod): number {
@@ -35,7 +36,25 @@ export class Criterium {
     if (!period.wasYesterdayRainy && !period.isRainy) return 0;
     else if (period.wasYesterdayRainy && !this.prevDayRainOkay) return -1;
     else if (period.isRainy && !this.rainOkay) return 1;
+    else return 0;
   }
+  
+  compWind(period: WeatherPeriod): number {
+    if (period.hiWind > this.maxWind) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+  
+  passes(period: WeatherPeriod, dest: object): boolean {
+    let temp = this.compTemperature(period);
+    let rain = this.compRain(period);
+    let wind = this.compWind(period);
+    // alert(temp, rain, wind);
+    return (temp === 0 && rain === 0 && wind === 0);
+  }
+  
   
   ratePeriodColor(period: WeatherPeriod): string {
     let color = 'white'
@@ -51,6 +70,13 @@ export class Criterium {
     }
     return color;
   }
+  
+  getDisplayString(): string {
+    return `Temp: ${this.minGoodTemp}\u00B0F - ${this.maxGoodTemp}\u00B0F, ` +
+      `Wet: ${this.prevDayRainOkay ? 'OK' : 'NO'}, ` +
+      `Rain: ${this.rainOkay ? 'OK' : 'NO'}, ` +
+      `Wind: ${this.maxWind} mph`;
+  }
 }
 
 export class WeatherPeriod {
@@ -62,7 +88,7 @@ export class WeatherPeriod {
   loWind: number;
   windString: string;
   isRainy: boolean;
-  wasYesterdayRainy: boolean;
+  wasYesterdayRainy: boolean = false;
   shortForecast: string = '';
   isDaytime: boolean;
   

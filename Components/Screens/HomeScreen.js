@@ -19,14 +19,33 @@ export default class HomeScreen extends React.Component {
   };
   
   renderItem(item: WeatherPeriod) {
-    const {criteria} = this.props.screenProps;
-    const color = criteria.ratePeriodColor(item);
+    const {criteriaList} = this.props.screenProps;
+    // const color = curr.ratePeriodColor(item);
+    let color = 'salmon';
+    if (!criteriaList || criteriaList.length === 0) {
+      color = 'lightgreen'
+    } else {
+      criteriaList.forEach((v,i,a) => {
+        if (v.passes(item)) {
+          color = 'lightgreen';
+        } else {
+          // alert(JSON.stringify(item));
+        }
+      });
+    }
     return (
-      <TouchableOpacity onPress={() => alert(item.name)}>
+      <TouchableOpacity onPress={() => {}}>
         <View style={[styles.row, {backgroundColor: color}]}>
-          <Text>
-            {item.getDisplayString()}
-          </Text>
+          <View style={{flex: 1}}>
+            <Text>
+              {item.getDisplayString()}
+            </Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Text>
+              {/*{reasons}*/}
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -34,7 +53,7 @@ export default class HomeScreen extends React.Component {
   
   render() {
     const {navigate} = this.props.navigation;
-    const { periods, loading, criteria, requestLocation } = this.props.screenProps;
+    const { periods, loading, requestLocation } = this.props.screenProps;
     let days = periods
     return (
       <KeyboardAvoidingView style={styles.container}
