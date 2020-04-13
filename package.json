@@ -7,13 +7,15 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build:ios": "react-native bundle --entry-file ./index.js --platform ios --bundle-output ios/main.jsbundle --assets-dest ios --dev false"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.9.0",
     "axios": "^0.19.2",
     "react": "16.11.0",
     "react-native": "0.62.2",
+    "react-native-check-box": "^2.1.7",
     "react-native-get-location": "^1.4.2"
   },
   "devDependencies": {

@@ -77,7 +77,6 @@ target 'RideDecide' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-  pod 'ReactNativeGetLocation', :path => '../node_modules/react-native-get-location'
 
   target 'RideDecideTests' do
     inherit! :complete
