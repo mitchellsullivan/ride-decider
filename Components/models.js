@@ -91,6 +91,8 @@ export class WeatherPeriod {
   wasYesterdayRainy: boolean = false;
   shortForecast: string = '';
   isDaytime: boolean;
+  date: string;
+  userRating: number = -1;
   
   constructor(pData) {
     this.idx = String(pData['number']);
@@ -109,12 +111,13 @@ export class WeatherPeriod {
       lfc.includes('rain') ||
       lfc.includes('storm');
     this.isDaytime = pData['isDaytime'];
+    this.date = pData['startTime'].substring(0, 10);
   }
   
   getDisplayString() {
-    return `${this.name}, ${this.temp}\u00B0${this.tempUnit}, ` +
+    return `${this.date} ${this.name}, ${this.temp}\u00B0${this.tempUnit}, ` +
       `${this.loWind}` +
       `${this.hiWind === this.loWind ? '' : ' to ' + this.hiWind}` +
-      `\n${this.shortForecast}`;
+      ` mph\n${this.shortForecast}`;
   }
 }

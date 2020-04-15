@@ -6,7 +6,7 @@ import {
 } from 'react-native'
 
 import {
-  createAppContainer
+  createAppContainer,
 } from 'react-navigation';
 
 import {
@@ -27,7 +27,8 @@ import {
 
 import HomeScreen from './Components/Screens/HomeScreen';
 import IconWithBadge from './Components/IconWithBadge';
-import criteriaListcreen from './Components/Screens/CriteriaScreen';
+import CriteriaScreen from './Components/Screens/CriteriaScreen';
+import RatingsScreen from './Components/Screens/RatingsScreen'
 import axios from 'axios';
 import GetLocation from 'react-native-get-location';
 import Uuid from 'react-native-uuid';
@@ -35,7 +36,8 @@ import Uuid from 'react-native-uuid';
 const TabStack = createBottomTabNavigator(
   {
     Home: HomeScreen,
-    Criteria: criteriaListcreen
+    Criteria: CriteriaScreen,
+    Ratings: RatingsScreen
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
@@ -46,22 +48,22 @@ const TabStack = createBottomTabNavigator(
           iconName = `home`;
         } else if (routeName === 'Criteria') {
           iconName = `plus-square`;
+        } else if (routeName === 'Ratings') {
+          iconName = `clock`;
         }
-        let color = focused ? 'cyan' : 'black';
+        let color = focused ? '#00b7ff' : 'dimgray';
         
         return (
-          <>
-            <IconWithBadge name={iconName}
-                           badgeCount={0}
-                           color={color}
-                           size={24}/>
-          </>
+          <IconWithBadge name={iconName}
+                         badgeCount={0}
+                         color={color}
+                         size={24}/>
         )
       },
     }),
     tabBarOptions: {
-      activeTintColor: 'blue',
-      inactiveTintColor: 'white',
+      activeBackgroundColor: 'white',
+      inactiveBackgroundColor: 'white',
       showLabel: false,
     },
   },
@@ -210,6 +212,7 @@ export default class App extends React.Component {
     this.setState({
       criteriaList
     });
+    this.saveState();
   }
   
   requestLocation = async () => {
@@ -235,11 +238,22 @@ export default class App extends React.Component {
     let curr = this.state.currCriteria;
     if (which === 'curr') {
       curr.rainOkay = !curr.rainOkay;
+      if (curr.rainOkay) {
+        curr.prevDayRainOkay = true;
+      }
     } else if (which === 'prev') {
       curr.prevDayRainOkay = !curr.prevDayRainOkay;
     }
     this.setState({
       currCriteria: curr,
+    })
+  }
+  
+  onRate = (rating) => {
+    let {periods} = this.state;
+    periods[0].userRating = rating;
+    this.setState({
+      periods,
     })
   }
   
@@ -259,7 +273,8 @@ export default class App extends React.Component {
             periods: this.state.periods,
             loading: this.state.loading,
             requestLocation: this.requestLocation,
-            delCriteria: this.delCriteria
+            delCriteria: this.delCriteria,
+            onRate: this.onRate,
           }}/>
       </>
     )

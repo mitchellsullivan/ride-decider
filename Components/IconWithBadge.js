@@ -1,9 +1,7 @@
 import React from 'react';
 import {
-  StatusBar,
   View,
   Text,
-  TouchableOpacity,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -28,7 +26,11 @@ export default class IconWithBadge extends React.Component {
               alignItems: 'center',
             }}
           >
-            <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
+            <Text style={{
+              color: 'white',
+              fontSize: 10,
+              fontWeight: 'bold'
+            }}>
               {/* {badgeCount} */}
             </Text>
           </View>
