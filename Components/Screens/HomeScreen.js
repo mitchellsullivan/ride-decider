@@ -11,8 +11,10 @@ import {
 import {styles} from '../../Styles'
 import {StarButton} from '../StarButton'
 import {DayRow} from '../DayRow'
+import { withGlobalContext } from '../GlobalContext';
+import {Criteria, WeatherPeriod} from '../models'
 
-export default class HomeScreen extends React.Component {
+class HomeScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Home',
@@ -23,11 +25,15 @@ export default class HomeScreen extends React.Component {
     starSet: -1
   }
   
+  async componentDidMount(): void {
+    await this.props.global.appInit();
+  }
+  
   setStar = (idx) => {
     if (idx === this.state.starSet) {
       idx = -1;
     }
-    this.props.screenProps.onRate(idx);
+    this.props.global.onRate(idx);
     this.setState({
       starSet: idx
     })
@@ -37,7 +43,7 @@ export default class HomeScreen extends React.Component {
     const {
       loading,
       requestLocation,
-    } = this.props.screenProps
+    } = this.props.global;
     
     return (
       <View style={[styles.headingView,]}>
@@ -66,7 +72,7 @@ export default class HomeScreen extends React.Component {
   }
   
   renderToday = () => {
-    let {periods} = this.props.screenProps;
+    let {periods} = this.props.global;
     if (periods.length > 0) {
       const shortFcLen = periods[0].shortForecast.length;
       let shortFcSize = shortFcLen > 16 ? 16 : 20;
@@ -89,7 +95,7 @@ export default class HomeScreen extends React.Component {
     const {
       periods,
       criteriaList
-    } = this.props.screenProps
+    } = this.props.global;
     const {starSet} = this.state;
     return (
       <SafeAreaView style={[styles.container]}
@@ -141,3 +147,5 @@ export default class HomeScreen extends React.Component {
     )
   }
 }
+
+export default withGlobalContext(HomeScreen);

@@ -13,8 +13,9 @@ import {Criteria} from '../models'
 import {SafeAreaView} from 'react-navigation'
 import {RatingsRow} from '../RatingsRow'
 import {CriteriaTextInput} from '../CriteriaTextInput'
+import {withGlobalContext} from '../GlobalContext'
 
-export default class RatingsScreen extends React.Component {
+class RatingsScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Criteria',
@@ -38,7 +39,7 @@ export default class RatingsScreen extends React.Component {
     let {
       history,
       delCriteria
-    } = this.props.screenProps;
+    } = this.props.global;
     return (
       <SafeAreaView style={[{flex: 1, justifyContent: 'center', padding: 0, margin:0}]}>
         <KeyboardAvoidingView style={{flex: 1, padding: 0, margin: 0, alignItems: 'center'}}
@@ -73,3 +74,5 @@ export default class RatingsScreen extends React.Component {
     );
   }
 }
+
+export default withGlobalContext(RatingsScreen);
