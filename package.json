@@ -20,6 +20,8 @@
     "react-native-check-box": "^2.1.7",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-get-location": "^1.4.2",
+    "react-native-keyboard-aware-scroll-view": "^0.9.1",
+    "react-native-keyboard-spacer": "^0.4.1",
     "react-native-reanimated": "^1.8.0",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.4.0",

@@ -3,7 +3,7 @@ import {styles} from '../Styles'
 import React from 'react'
 
 
-export const CriteriaTextInput = ({label, saveState, onChangeTemp, which, curr}) => {
+export const CriteriaTextInput = ({label, saveState, onChangeTemp, which, val}) => {
   return (
     <View style={{flex: 1}}>
       <Text style={{fontSize: 12}}>{label}</Text>
@@ -15,7 +15,7 @@ export const CriteriaTextInput = ({label, saveState, onChangeTemp, which, curr})
                    await saveState();
                  }}
                  onChangeText={(text) => onChangeTemp(text, which)}
-                 value={String(curr.minGoodTemp)}
+                 value={String(val)}
                  style={[styles.tempBox, {justifyContent: 'flex-start'}]}
                  maxLength={3}/>
     </View>

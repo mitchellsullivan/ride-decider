@@ -1,8 +1,8 @@
 import React from 'react';
 
 import {
-  AsyncStorage,
-  StatusBar,
+  AsyncStorage, Button, KeyboardAvoidingView,
+  StatusBar, Text, TextInput, View, SafeAreaView, ScrollView
 } from 'react-native'
 
 import {
@@ -10,8 +10,8 @@ import {
 } from 'react-navigation';
 
 import {
-  createStackNavigator,
-} from 'react-navigation-stack';
+  createStackNavigator, Header,
+} from 'react-navigation-stack'
 
 import {
   createBottomTabNavigator,
@@ -32,6 +32,9 @@ import RatingsScreen from './Components/Screens/RatingsScreen'
 import axios from 'axios';
 import GetLocation from 'react-native-get-location';
 import Uuid from 'react-native-uuid';
+import {styles} from './Styles'
+
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const TabStack = createBottomTabNavigator(
   {
@@ -69,24 +72,15 @@ const TabStack = createBottomTabNavigator(
   },
 )
 
-const MainStack = createStackNavigator(
-  {
-    Home: { screen: TabStack },
-  },
-  {
-    initialRouteName: 'Home',
-    headerMode: 'none',
-  }
-)
-
-const AppContainer = createAppContainer(MainStack);
+const AppContainer = createAppContainer(TabStack);
 
 export default class App extends React.Component {
   state = {
     currCriteria: new Criteria(),
     criteriaList: [],
     periods: [],
-    loading: false
+    loading: false,
+    history: []
   }
   
   toClass = (obj, proto) => {
@@ -250,9 +244,21 @@ export default class App extends React.Component {
   }
   
   onRate = (rating) => {
-    let {periods} = this.state;
-    periods[0].userRating = rating;
+    let {periods, history} = this.state;
+    let fst = periods[0];
+    fst.userRating = rating;
+    let existing = history
+      .find(h => h.date === fst.date);
+    if (!existing) {
+      history = [...history, fst];
+    } else {
+      existing.userRating = rating;
+    }
+    if (rating === -1) {
+      history = history.filter((h) => h !== existing);
+    }
     this.setState({
+      history,
       periods,
     })
   }
@@ -260,7 +266,7 @@ export default class App extends React.Component {
   render() {
     return (
       <>
-        <StatusBar barStyle='dark-content' />
+        <StatusBar barStyle='dark-content'/>
         <AppContainer
           screenProps={{
             saveState: this.saveState,
@@ -275,7 +281,77 @@ export default class App extends React.Component {
             requestLocation: this.requestLocation,
             delCriteria: this.delCriteria,
             onRate: this.onRate,
+            history: this.state.history
           }}/>
+        {/*<KeyboardAvoidingView style={{backgroundColor: 'azure', flex: 1}}*/}
+        {/*                      behavior={Platform.OS === "ios" ? "padding" : null}*/}
+        {/*                      contentContainerStyle={{flex: 1}}>*/}
+        {/*<KeyboardAwareScrollView>*/}
+        {/*  <SafeAreaView style={[{flex: 1}]}>*/}
+        {/*  <ScrollView contentContainerStyle={{flex: 1, justifyContent: 'flex-end'}}>*/}
+        {/*    <Text style={{*/}
+        {/*      fontSize: 36,*/}
+        {/*      marginBottom: 48,*/}
+        {/*    }}>*/}
+        {/*      Header*/}
+        {/*    </Text>*/}
+        {/*    <TextInput*/}
+        {/*      placeholder="Username"*/}
+        {/*      style={{        height: 40,*/}
+        {/*        borderColor: "#000000",*/}
+        {/*        borderBottomWidth: 1,*/}
+        {/*        marginBottom: 36,}}*/}
+        {/*    />*/}
+        {/*    <TextInput*/}
+        {/*      placeholder="Password"*/}
+        {/*      style={{        height: 40,*/}
+        {/*        borderColor: "#000000",*/}
+        {/*        borderBottomWidth: 1,*/}
+        {/*        marginBottom: 36,}}*/}
+        {/*    />*/}
+        {/*    <TextInput*/}
+        {/*      placeholder="Confrim Password"*/}
+        {/*      style={{        height: 40,*/}
+        {/*        borderColor: "#000000",*/}
+        {/*        borderBottomWidth: 1,*/}
+        {/*        marginBottom: 36,}}*/}
+        {/*    />*/}
+        {/*    <TextInput*/}
+        {/*      placeholder="Confrim Password"*/}
+        {/*      style={{        height: 40,*/}
+        {/*        borderColor: "#000000",*/}
+        {/*        borderBottomWidth: 1,*/}
+        {/*        marginBottom: 36,}}*/}
+        {/*    />*/}
+        {/*    <TextInput*/}
+        {/*      placeholder="Confrim Password"*/}
+        {/*      style={{        height: 40,*/}
+        {/*        borderColor: "#000000",*/}
+        {/*        borderBottomWidth: 1,*/}
+        {/*        marginBottom: 36,}}*/}
+        {/*    />*/}
+        {/*    <TextInput*/}
+        {/*      placeholder="Confrim Password"*/}
+        {/*      style={{        height: 40,*/}
+        {/*        borderColor: "#000000",*/}
+        {/*        borderBottomWidth: 1,*/}
+        {/*        marginBottom: 36,}}*/}
+        {/*    />*/}
+        {/*    <TextInput*/}
+        {/*      placeholder="Confrim Password"*/}
+        {/*      style={{        height: 40,*/}
+        {/*        borderColor: "#000000",*/}
+        {/*        borderBottomWidth: 1,*/}
+        {/*        marginBottom: 36,}}*/}
+        {/*    />*/}
+        {/*    <View style={styles.btnContainer}>*/}
+        {/*      <Button title="Submit" onPress={() => null} />*/}
+        {/*    </View>*/}
+        {/*    /!*<View style={{ flex : 1 }} />*!/*/}
+        {/*  </ScrollView>*/}
+        {/*  </SafeAreaView>*/}
+        {/*</KeyboardAvoidingView>*/}
+        {/*</KeyboardAwareScrollView>*/}
       </>
     )
   }

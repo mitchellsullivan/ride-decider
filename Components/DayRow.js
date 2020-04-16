@@ -4,17 +4,20 @@ import {styles} from '../Styles'
 
 
 export const DayRow = ({item, criteriaList}) => {
+  let goodbad = 'N';
   let color = 'salmon'
   if (!criteriaList || criteriaList.length === 0) {
-    color = 'lightgreen'
+    goodbad = 'Y';
+    color = 'lightgreen';
   } else {
     criteriaList.forEach((v, i, a) => {
       if (v.passes(item)) {
-        color = 'lightgreen'
+        goodbad = 'Y';
+        color = 'lightgreen';
       }
     })
   }
-  
+  color = 'white';
   return (
     <TouchableOpacity onPress={() => {}}>
       <View style={[styles.row, {backgroundColor: color}]}>
@@ -23,9 +26,10 @@ export const DayRow = ({item, criteriaList}) => {
             {item.getDisplayString()}
           </Text>
         </View>
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <Text>
-            {item.userRating === -1 ? '' : item.userRating}
+            {goodbad}
+            {/*{item.userRating === -1 ? '' : item.userRating}*/}
           </Text>
         </View>
       </View>

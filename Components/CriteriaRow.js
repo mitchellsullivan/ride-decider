@@ -1,20 +1,28 @@
 import React from 'react';
-import {Text, TouchableOpacity, View} from 'react-native'
+import {Text, TouchableOpacity, TouchableHighlight, View} from 'react-native'
 import {styles} from '../Styles'
+import IconWithBadge from './IconWithBadge'
 
 export const CriteriaRow = ({delCriteria, item}) => {
   return (
-    <TouchableOpacity onPress={() => delCriteria(item.uuid)}>
-      <View style={[styles.row, {backgroundColor: 'white', flexDirection: 'column'}]}>
-        <View>
-          <Text style={{fontSize: 10}}>
-            {item.getDisplayString()}
-          </Text>
+      <View style={[styles.row, {backgroundColor: 'white', flexDirection: 'row'}]}>
+        <View style={{flex: 6, flexDirection: 'column'}}>
+          <View>
+            <Text style={{fontSize: 10}}>
+              {item.getDisplayString()}
+            </Text>
+          </View>
+          <View>
+            <Text style={{fontSize: 10}}>{item.uuid}</Text>
+          </View>
         </View>
         <View>
-          <Text style={{fontSize: 10}}>{item.uuid}</Text>
+          <TouchableOpacity onPress={() => delCriteria(item.uuid)}>
+            <IconWithBadge name={'x'}
+                           size={30}
+                           color={'darkred'}/>
+          </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
   );
 }
