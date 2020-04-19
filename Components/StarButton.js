@@ -14,7 +14,7 @@ export const StarButton = ({index, currIdx, onPress}) => {
                         }}
                         onPress={() => onPress(index)}
                         underlayColor={active ? 'goldenrod' : 'dimgray'}>
-      <IconWithBadge name='star'
+      <IconWithBadge name='thumbs-up'
                      size={24}
                      color={active ? '#555' : 'whitesmoke'}/>
     </TouchableHighlight>

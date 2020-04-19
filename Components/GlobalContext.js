@@ -45,6 +45,7 @@ export class GlobalContextProvider extends React.Component {
       currCriteria: new Criteria(),
       criteriaList: [],
       periods: [],
+      history: [],
       loading: false
     }
     try {
@@ -55,6 +56,8 @@ export class GlobalContextProvider extends React.Component {
         await AsyncStorage.getItem('periods')) || ret.periods;
       ret.criteriaList = JSON.parse(
         await AsyncStorage.getItem('criteriaList')) || ret.criteriaList;
+      // ret.history = JSON.parse(
+      //   await AsyncStorage.getItem('history')) || ret.history;
     } catch (error) {
     }
     // alert(JSON.stringify(ret));
@@ -69,6 +72,9 @@ export class GlobalContextProvider extends React.Component {
         'periods', JSON.stringify(this.state.periods));
       await AsyncStorage.setItem(
         'criteriaList', JSON.stringify(this.state.criteriaList));
+      await AsyncStorage.setItem(
+        'history', JSON.stringify(this.state.history)
+      )
     } catch (error) {
     }
   };
@@ -123,11 +129,13 @@ export class GlobalContextProvider extends React.Component {
     }
     cc.maxWind = parseFloat(cc.maxWind);
     let criteriaList = [...this.state.criteriaList, cc];
-    let next = new Criteria(cc.minGoodTemp,
+    let next = new Criteria(
+      cc.minGoodTemp,
       cc.maxGoodTemp,
       cc.rainOkay,
       cc.prevDayRainOkay,
-      cc.maxWind);
+      cc.maxWind
+    );
     this.setState({
       criteriaList,
       currCriteria: next

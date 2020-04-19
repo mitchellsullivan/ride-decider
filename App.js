@@ -1,26 +1,29 @@
-import React from 'react'
+import React from 'react';
 
 import {
   NavigationContainer
-} from '@react-navigation/native'
+} from '@react-navigation/native';
 
 import {
   createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs'
+} from '@react-navigation/bottom-tabs';
 
 import {
-  Criteria, WeatherPeriod,
-} from './Components/models'
+  Criteria
+} from './Components/models';
 
+import {
+  StatusBar
+} from 'react-native';
 
-import HomeScreen from './Components/Screens/HomeScreen'
-import IconWithBadge from './Components/IconWithBadge'
-import CriteriaScreen from './Components/Screens/CriteriaScreen'
-import RatingsScreen from './Components/Screens/RatingsScreen'
+import HomeScreen from './Components/Screens/HomeScreen';
+import IconWithBadge from './Components/IconWithBadge';
+import CriteriaScreen from './Components/Screens/CriteriaScreen';
+import RatingsScreen from './Components/Screens/RatingsScreen';
 
-import {GlobalContextProvider, withGlobalContext} from './Components/GlobalContext'
+import {GlobalContextProvider} from './Components/GlobalContext';
 
-const Tab = createBottomTabNavigator()
+const Tab = createBottomTabNavigator();
 
 export default class App extends React.Component {
   render() {

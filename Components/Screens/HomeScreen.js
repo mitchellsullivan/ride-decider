@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,12 @@ import {
   ActivityIndicator,
   FlatList,
   SafeAreaView
-} from 'react-native'
+} from 'react-native';
 
-import {styles} from '../../Styles'
-import {StarButton} from '../StarButton'
-import {DayRow} from '../DayRow'
+import {styles} from '../../Styles';
+import {StarButton} from '../StarButton';
+import {DayRow} from '../DayRow';
 import { withGlobalContext } from '../GlobalContext';
-import {Criteria, WeatherPeriod} from '../models'
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -111,7 +110,11 @@ class HomeScreen extends React.Component {
             {this.renderToday()}
           </View>
         </View>
-        <View style={{flex: 0.10, borderWidth: 0, width: 350, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{flex: 0.10,
+          borderWidth: 0,
+          width: 350,
+          alignItems: 'center',
+          justifyContent: 'center'}}>
           {/*<Text style={{fontSize: 14, padding: 5}}>Rate Today:</Text>*/}
           <View style={{flexDirection: 'row'}}>
             {[0,1,2,3,4].map(n =>
