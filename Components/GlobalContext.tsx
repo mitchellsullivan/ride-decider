@@ -1,22 +1,66 @@
-import React from 'react';
-import {Criteria, DEFAULT_HI, DEFAULT_LO, DEFAULT_LOC, WeatherPeriod} from './models'
+import React, {Component, JSXElementConstructor} from 'react';
+import {
+  Criteria,
+  DEFAULT_HI,
+  DEFAULT_LO,
+  DEFAULT_LOC,
+  WeatherPeriod,
+  PeriodData
+} from './models'
 import {AsyncStorage} from 'react-native'
 import Uuid from 'react-native-uuid'
 import axios from 'axios'
-import GetLocation from 'react-native-get-location'
+// @ts-ignore
+import GetLocation from 'react-native-get-location';
 
 const GlobalContext = React.createContext({});
 
-export class GlobalContextProvider extends React.Component {
-  state = {
-    currCriteria: new Criteria(),
-    criteriaList: [],
-    periods: [],
-    loading: false,
-    history: []
+interface Location {
+  latitude: number;
+  longitude: number;
+}
+
+type ByPointsData = {
+  data: {
+    properties: {
+      forecast: string
+    }
+  }
+}
+
+
+type ForecastData = {
+  data: {
+    properties: {
+      periods: Array<PeriodData>
+    }
+  }
+}
+
+
+export class GlobalState {
+  public currCriteria: Criteria = new Criteria();
+  public criteriaList: Array<Criteria> = [];
+  public periods: Array<WeatherPeriod> = [];
+  public loading: boolean = false;
+  public history: Array<WeatherPeriod> = [];
+  public location: Location = DEFAULT_LOC;
+}
+
+export class GlobalContextProvider extends React.Component<any, GlobalState> {
+  // state = {
+  //   currCriteria: new Criteria(),
+  //   criteriaList: [],
+  //   periods: [],
+  //   loading: false,
+  //   history: []
+  // }
+  constructor(props: any) {
+    super(props);
+    this.state = new GlobalState()
   }
   
-  toClass = (obj, proto) => {
+  toClass = (obj: any, proto: object) => {
     obj.__proto__ = proto;
     return obj;
   }
@@ -41,23 +85,24 @@ export class GlobalContextProvider extends React.Component {
   }
   
   loadSavedState = async () => {
-    let ret = {
-      currCriteria: new Criteria(),
-      criteriaList: [],
-      periods: [],
-      history: [],
-      loading: false
-    }
+    // let ret = {
+    //   currCriteria: new Criteria(),
+    //   criteriaList: [],
+    //   periods: [],
+    //   history: [],
+    //   loading: false
+    // }
+    let ret = new GlobalState();
     try {
       ret.currCriteria = JSON.parse(
-        await AsyncStorage.getItem('curr')) || ret.currCriteria;
+        await AsyncStorage.getItem('curr') as string) || ret.currCriteria;
       ret.currCriteria.uuid = Uuid.v1();
       ret.periods = JSON.parse(
-        await AsyncStorage.getItem('periods')) || ret.periods;
+        await AsyncStorage.getItem('periods') as string) || ret.periods;
       ret.criteriaList = JSON.parse(
-        await AsyncStorage.getItem('criteriaList')) || ret.criteriaList;
-      // ret.history = JSON.parse(
-      //   await AsyncStorage.getItem('history')) || ret.history;
+        await AsyncStorage.getItem('criteriaList') as string) || ret.criteriaList;
+      ret.history = JSON.parse(
+        await AsyncStorage.getItem('history') as string) || ret.history;
     } catch (error) {
     }
     // alert(JSON.stringify(ret));
@@ -65,21 +110,22 @@ export class GlobalContextProvider extends React.Component {
   }
   
   saveState = async () => {
+    const {currCriteria, periods, criteriaList, history} = this.state;
     try {
       await AsyncStorage.setItem(
-        'curr', JSON.stringify(this.state.currCriteria));
+        'curr', JSON.stringify(currCriteria));
       await AsyncStorage.setItem(
-        'periods', JSON.stringify(this.state.periods));
+        'periods', JSON.stringify(periods));
       await AsyncStorage.setItem(
-        'criteriaList', JSON.stringify(this.state.criteriaList));
+        'criteriaList', JSON.stringify(criteriaList));
       await AsyncStorage.setItem(
-        'history', JSON.stringify(this.state.history)
+        'history', JSON.stringify(history)
       )
     } catch (error) {
     }
   };
   
-  onChangeTemp = (t, which) => {
+  onChangeTemp = (t: string, which: string) => {
     let currCriteria = this.state.currCriteria;
     if (which === 'hi') {
       currCriteria.maxGoodTemp = t;
@@ -93,16 +139,16 @@ export class GlobalContextProvider extends React.Component {
     })
   }
   
-  populate = async (location) => {
+  populate = async (location: Location) => {
     location = location || DEFAULT_LOC;
-    let long = (location['longitude'] || 0).toFixed(1);
-    let lat = (location['latitude'] || 0).toFixed(1);
+    let long = location.longitude.toFixed(1);
+    let lat = location.latitude.toFixed(1);
     let url = `https://api.weather.gov/points/${lat},${long}`;
-    let data = await axios.get(url);
-    let forecastUrl = data['data']['properties']['forecast'];
-    let dataFc = await axios.get(forecastUrl);
-    let periods = dataFc['data']['properties']['periods']
-      .map(p => new WeatherPeriod(p))
+    let data: ByPointsData = await axios.get(url);
+    let forecastUrl = data.data.properties.forecast;
+    let dataFc: ForecastData = await axios.get(forecastUrl);
+    let periods = dataFc.data.properties.periods
+      .map((p: any) => new WeatherPeriod(p))
       .filter(p => p.isDaytime)
     periods.forEach((v, i, a) => {
       if (v.isRainy && i < a.length - 1) {
@@ -121,29 +167,21 @@ export class GlobalContextProvider extends React.Component {
   
   addCriteria = async () => {
     let cc = this.state.currCriteria;
-    let min = parseFloat(cc.minGoodTemp || DEFAULT_LO);
-    let max = parseFloat(cc.maxGoodTemp || DEFAULT_HI);
+    let min = parseFloat(String(cc.minGoodTemp) || DEFAULT_LO);
+    let max = parseFloat(String(cc.maxGoodTemp) || DEFAULT_HI);
     if (min > max) {
       cc.minGoodTemp = max;
       cc.maxGoodTemp = min;
     }
     cc.maxWind = parseFloat(cc.maxWind);
-    let criteriaList = [...this.state.criteriaList, cc];
-    let next = new Criteria(
-      cc.minGoodTemp,
-      cc.maxGoodTemp,
-      cc.rainOkay,
-      cc.prevDayRainOkay,
-      cc.maxWind
-    );
     this.setState({
-      criteriaList,
-      currCriteria: next
+      criteriaList: [...this.state.criteriaList, cc],
+      currCriteria: Criteria.fromOther(cc)
     })
     await this.saveState();
   }
   
-  delCriteria = (uuid) => {
+  delCriteria = (uuid: string) => {
     let criteriaList = this.state.criteriaList
       .filter(v => v.uuid !== uuid);
     this.setState({
@@ -155,7 +193,7 @@ export class GlobalContextProvider extends React.Component {
   requestLocation = async () => {
     this.setState({
       loading: true,
-      location: null
+      location: {latitude: 0, longitude: 0}
     });
     let location = null;
     try {
@@ -171,7 +209,7 @@ export class GlobalContextProvider extends React.Component {
     await this.populate(location);
   }
   
-  onChangeRain = (which) => {
+  onChangeRain = (which: string) => {
     let curr = this.state.currCriteria;
     if (which === 'curr') {
       curr.rainOkay = !curr.rainOkay;
@@ -186,7 +224,7 @@ export class GlobalContextProvider extends React.Component {
     })
   }
   
-  onRate = (rating) => {
+  onRate = (rating: number) => {
     let {periods, history} = this.state;
     let fst = periods[0];
     fst.userRating = rating;
@@ -207,6 +245,7 @@ export class GlobalContextProvider extends React.Component {
   }
   
   render () {
+    const {children} = this.props;
     return (
       <GlobalContext.Provider
         value={{
@@ -227,14 +266,14 @@ export class GlobalContextProvider extends React.Component {
           appInit: this.appInit
         }}
       >
-        {this.props.children}
+        {children}
       </GlobalContext.Provider>
     )
   }
 }
 
 // create the consumer as higher order component
-export const withGlobalContext = ChildComponent => props => (
+export const withGlobalContext = (ChildComponent: any) => (props: any) => (
   <GlobalContext.Consumer>
     {
       context => <ChildComponent {...props} global={context}  />

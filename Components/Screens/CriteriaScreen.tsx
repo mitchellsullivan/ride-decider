@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   Switch,
   KeyboardAvoidingView,
+  Platform
 } from 'react-native'
-import {styles} from '../../Styles'
+import {styles} from '../Styles'
 import {Criteria} from '../models'
 import {SafeAreaView} from 'react-navigation'
 import {CriteriaRow} from '../CriteriaRow'
@@ -14,8 +15,8 @@ import {CriteriaTextInput} from '../CriteriaTextInput'
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view'
 import { withGlobalContext } from '../GlobalContext';
 
-class CriteriaScreen extends React.Component {
-  static navigationOptions = ({navigation}) => {
+class CriteriaScreen extends React.Component<any> {
+  static navigationOptions = ({navigation}: any) => {
     return {
       title: 'Criteria',
     };
@@ -34,7 +35,6 @@ class CriteriaScreen extends React.Component {
   }
 
   render() {
-    const {navigate} = this.props.navigation;
     let {
       curr,
       criteriaList,
@@ -47,7 +47,7 @@ class CriteriaScreen extends React.Component {
     return (
       <SafeAreaView style={[{flex: 1}]}>
         <KeyboardAvoidingView style={{flex: 1, padding: 0, margin: 0, alignItems: 'center'}}
-                              behavior={Platform.OS === "ios" ? 'padding' : null}
+                              behavior={Platform.OS === "ios" ? 'padding' : undefined}
                               keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}>
         {this.renderHeading()}
 

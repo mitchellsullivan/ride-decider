@@ -6,17 +6,18 @@ import {
   Switch,
   KeyboardAvoidingView,
   FlatList,
-  ScrollView
+  ScrollView,
+  Platform
 } from 'react-native'
-import {styles} from '../../Styles'
+import {styles} from '../Styles'
 import {Criteria} from '../models'
 import {SafeAreaView} from 'react-navigation'
 import {RatingsRow} from '../RatingsRow'
 import {CriteriaTextInput} from '../CriteriaTextInput'
 import {withGlobalContext} from '../GlobalContext'
 
-class RatingsScreen extends React.Component {
-  static navigationOptions = ({navigation}) => {
+class RatingsScreen extends React.Component<any> {
+  static navigationOptions = ({navigation}: any) => {
     return {
       title: 'Criteria',
     };
@@ -35,7 +36,6 @@ class RatingsScreen extends React.Component {
   }
   
   render() {
-    const {navigate} = this.props.navigation;
     let {
       history,
       delCriteria
@@ -43,7 +43,7 @@ class RatingsScreen extends React.Component {
     return (
       <SafeAreaView style={[{flex: 1, justifyContent: 'center', padding: 0, margin:0}]}>
         <KeyboardAvoidingView style={{flex: 1, padding: 0, margin: 0, alignItems: 'center'}}
-                              behavior={Platform.OS === "ios" ? "padding" : null}
+                              behavior={Platform.OS === "ios" ? "padding" : undefined}
                               keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}>
             {this.renderHeading()}
             {!history || history.length === 0 ? (

@@ -8,13 +8,13 @@ import {
   SafeAreaView
 } from 'react-native';
 
-import {styles} from '../../Styles';
+import {styles} from '../Styles';
 import {StarButton} from '../StarButton';
 import {DayRow} from '../DayRow';
-import { withGlobalContext } from '../GlobalContext';
+import {withGlobalContext} from '../GlobalContext';
 
-class HomeScreen extends React.Component {
-  static navigationOptions = ({navigation}) => {
+class HomeScreen extends React.Component<any> {
+  static navigationOptions = ({navigation}: any) => {
     return {
       title: 'Home',
     }
@@ -23,12 +23,12 @@ class HomeScreen extends React.Component {
   state = {
     starSet: -1
   }
-  
-  async componentDidMount(): void {
+
+  async componentDidMount(): Promise<void> {
     await this.props.global.appInit();
   }
   
-  setStar = (idx) => {
+  setStar = (idx: number) => {
     if (idx === this.state.starSet) {
       idx = -1;
     }
@@ -97,8 +97,7 @@ class HomeScreen extends React.Component {
     } = this.props.global;
     const {starSet} = this.state;
     return (
-      <SafeAreaView style={[styles.container]}
-                    behavior='padding'>
+      <SafeAreaView style={[styles.container]}>
         {this.renderHeading()}
         <View style={[{flex: 0.25, flexDirection: 'row', width: 350}]}>
           <View style={[{

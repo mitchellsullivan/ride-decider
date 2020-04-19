@@ -1,9 +1,9 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native'
-import {styles} from '../Styles'
+import {styles} from './Styles'
 
 
-export const RatingsRow = ({item}) => {
+export const RatingsRow = ({item}: any) => {
   return (
     <TouchableOpacity onPress={() => {}}>
       <View style={[styles.row]}>

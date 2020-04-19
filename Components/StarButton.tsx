@@ -1,9 +1,9 @@
 import React from 'react';
-import {TouchableHighlight} from 'react-native'
-import IconWithBadge from './IconWithBadge'
+import {TouchableHighlight} from 'react-native';
+import IconWithBadge from './IconWithBadge';
 
 
-export const StarButton = ({index, currIdx, onPress}) => {
+export const StarButton = ({index, currIdx, onPress}: any) => {
   const active = currIdx >= index && currIdx > -1;
   
   return (
@@ -15,6 +15,7 @@ export const StarButton = ({index, currIdx, onPress}) => {
                         onPress={() => onPress(index)}
                         underlayColor={active ? 'goldenrod' : 'dimgray'}>
       <IconWithBadge name='thumbs-up'
+                     badgeCount={0}
                      size={24}
                      color={active ? '#555' : 'whitesmoke'}/>
     </TouchableHighlight>

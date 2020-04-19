@@ -9,17 +9,10 @@ import {
 } from '@react-navigation/bottom-tabs';
 
 import {
-  Criteria
-} from './Components/models';
-
-import {
-  StatusBar
-} from 'react-native';
-
-import HomeScreen from './Components/Screens/HomeScreen';
+  HomeScreen, RatingsScreen, CriteriaScreen
+} from './Components/Screens';
 import IconWithBadge from './Components/IconWithBadge';
-import CriteriaScreen from './Components/Screens/CriteriaScreen';
-import RatingsScreen from './Components/Screens/RatingsScreen';
+
 
 import {GlobalContextProvider} from './Components/GlobalContext';
 
@@ -32,7 +25,7 @@ export default class App extends React.Component {
         <NavigationContainer>
           <Tab.Navigator screenOptions={({route}) => ({
               tabBarIcon: ({focused, color, size}) => {
-                let iconName;
+                let iconName: string;
                 if (route.name === 'Home') {
                   iconName = `home`;
                 } else if (route.name === 'Criteria') {
@@ -41,7 +34,7 @@ export default class App extends React.Component {
                   iconName = `clock`;
                 }
                 let colour = focused ? '#00b7ff' : 'dimgray';
-        
+
                 return (
                   <IconWithBadge name={iconName}
                                  badgeCount={0}

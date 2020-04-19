@@ -1,10 +1,18 @@
 import {Keyboard, Text, TextInput, View} from 'react-native'
-import {styles} from '../Styles'
+import {styles} from './Styles'
 import React from 'react'
 
+type CriteriaTextInputProps = {
+    label: string,
+    saveState: () => void,
+    onChangeTemp: Function,
+    which: string,
+    val: any
+}
 
-export const CriteriaTextInput = ({label, saveState, onChangeTemp, which, val}) => {
-  return (
+export const CriteriaTextInput = (props: CriteriaTextInputProps) => {
+    const {label, saveState, onChangeTemp, which, val} = props;
+    return (
     <View style={{flex: 1}}>
       <Text style={{fontSize: 12}}>{label}</Text>
       <TextInput keyboardType='numeric'

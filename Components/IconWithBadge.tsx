@@ -6,7 +6,14 @@ import {
 
 import Icon from 'react-native-vector-icons/Feather';
 
-export default class IconWithBadge extends React.Component {
+interface IconWithBadgeProps {
+  name: string,
+  badgeCount: number,
+  color: string,
+  size: number
+}
+
+export default class IconWithBadge extends React.Component<IconWithBadgeProps> {
   render() {
     const { name, badgeCount, color, size } = this.props;
     return (

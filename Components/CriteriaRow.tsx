@@ -1,9 +1,15 @@
 import React from 'react';
 import {Text, TouchableOpacity, TouchableHighlight, View} from 'react-native'
-import {styles} from '../Styles'
+import {styles} from './Styles'
 import IconWithBadge from './IconWithBadge'
+import {Criteria} from './models';
 
-export const CriteriaRow = ({delCriteria, item}) => {
+type CriteriaRowProps = {
+    delCriteria: any,
+    item: Criteria
+}
+
+export const CriteriaRow = ({delCriteria, item}: CriteriaRowProps) => {
   return (
       <View style={[styles.row, {backgroundColor: 'white', flexDirection: 'row'}]}>
         <View style={{flex: 6, flexDirection: 'column'}}>
@@ -19,6 +25,7 @@ export const CriteriaRow = ({delCriteria, item}) => {
         <View>
           <TouchableOpacity onPress={() => delCriteria(item.uuid)}>
             <IconWithBadge name={'x'}
+                           badgeCount={0}
                            size={30}
                            color={'darkred'}/>
           </TouchableOpacity>
