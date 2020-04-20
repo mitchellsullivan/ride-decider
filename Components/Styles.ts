@@ -2,11 +2,9 @@ import {StyleSheet, StatusBar} from 'react-native'
 
 export const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // padding: ,
-    // backgroundColor: 'white',
+    backgroundColor: 'black',
   },
   topSpace: {
     marginTop: 0,
@@ -20,28 +18,16 @@ export const styles = StyleSheet.create({
     paddingTop: 10,
     borderBottomWidth: 0.25,
     borderBottomColor: 'gray',
-    backgroundColor: 'teal',
+    backgroundColor: '#111',
   },
   headingText: {
     fontSize: 20,
     textAlign: 'center',
     marginBottom: 8,
     color: 'white',
-    fontWeight: 'bold'
+    fontWeight: '500'
   },
-  tempBox: {
-    width: 70,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: 'lightgray',
-    height: 40,
-    padding: 5,
-    margin: 5,
-    fontSize: 18,
-    textAlign: 'center',
-    color: 'black',
-    backgroundColor: 'white'
-  },
+
   welcome: {
     fontSize: 20,
     textAlign: 'center',
@@ -65,7 +51,8 @@ export const styles = StyleSheet.create({
   buttText: {
     color: 'cyan',
     fontSize: 16,
-    textAlign: 'center'
+    textAlign: 'center',
+    fontWeight: "500"
   },
   buttView: {
   },
@@ -76,8 +63,8 @@ export const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   listView: {
-    width: '95%',
-    backgroundColor: 'white',
+    width: '100%',
+    // backgroundColor: 'white',
     // width: '100%'
   },
   scroll: {
@@ -86,13 +73,13 @@ export const styles = StyleSheet.create({
     // borderWidth: 1
   },
   row: {
-    height: 50,
+    height: 60,
     marginTop: 0,
-    marginBottom: 3,
-    // borderColor: 'black',
-    // borderBottomWidth: 0.5,
-    padding: 5,
+    marginBottom: 0,
+    borderColor: 'gray',
+    // borderBottomWidth: 0.25,
+    paddingLeft: 15,
+    paddingRight: 15,
     flexDirection: 'row',
-    borderBottomWidth: 1
   },
 });

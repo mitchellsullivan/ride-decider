@@ -28,7 +28,8 @@ export type PeriodData = {
 
 export class Criteria {
   static fromOther(other: Criteria): Criteria {
-    return Object.assign(new Criteria(), {...other, uuid: Uuid.v1()});
+    return Object.assign(new Criteria(),
+        {...other, uuid: Uuid.v1()});
   }
 
   constructor(public minGoodTemp: any = parseFloat(DEFAULT_LO),
@@ -72,46 +73,46 @@ export class Criteria {
   }
 }
 
+export enum LikeStatus {
+  DISLIKED = -1,
+  NEUTRAL = 0,
+  LIKED = 1,
+}
+
 export class WeatherPeriod {
-  public idx: string;
-  public name: string;
-  public tempUnit: string;
-  public temp: number;
+  public get idx(): string { return String(this.pData.number)}
+  public get tempUnit(): string { return this.pData.temperatureUnit }
+  public get temp(): number { return this.pData.temperature }
+  public get shortForecast(): string { return this.pData.shortForecast}
+  public get isDaytime(): boolean { return this.pData.isDaytime}
+  public get name(): string { return this.pData.name };
+
+  public get date(): string {
+    return this.pData.startTime.substring(0, 10);
+  }
+  public get isRainy(): boolean {
+    return ['shower', 'rain', 'storm']
+        .some(w => this.shortForecast.toLowerCase().includes(w));
+  }
+
   public hiWind: number;
   public loWind: number;
   public windString: string;
-  public isRainy: boolean;
   public wasYesterdayRainy: boolean = false;
-  public shortForecast: string = '';
-  public isDaytime: boolean;
-  public date: string;
   public userRating: number = -1;
-  
-  constructor(pData: PeriodData) {
-    const {
-      number, name, temperature, windSpeed, shortForecast,
-      temperatureUnit, isDaytime, startTime
-    } = pData;
-    this.idx = String(number);
-    this.name = name;
-    this.temp = temperature;
-    this.windString = windSpeed;
-    this.shortForecast = shortForecast;
-    this.tempUnit = temperatureUnit;
-    this.isDaytime = isDaytime;
-    this.date = startTime.substring(0, 10);
 
-    let winds = this.windString
+  public likedStatus: LikeStatus = LikeStatus.NEUTRAL;
+
+  constructor(public pData: PeriodData) {
+    const { windSpeed } = pData;
+    this.windString = windSpeed;
+    let winds = windSpeed
       .replace('mph', '')
       .split(' to ');
-
     this.loWind = parseFloat(winds[0]);
     this.hiWind = winds.length < 2 ? this.loWind : parseFloat(winds[1]);
-
-    this.isRainy = ['shower', 'rain', 'storm']
-        .some(w => this.shortForecast.toLowerCase().includes(w));
   }
-  
+
   getDisplayString() {
     return `${this.date} ${this.name}, ${this.temp}\u00B0${this.tempUnit}, ` +
       `${this.loWind}` +

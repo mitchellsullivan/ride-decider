@@ -6,6 +6,11 @@
  */
 
 module.exports = {
+  resolver: {
+    extraNodeModules: {
+      likely: require('likely'),
+    },
+  },
   transformer: {
     getTransformOptions: async () => ({
       transform: {

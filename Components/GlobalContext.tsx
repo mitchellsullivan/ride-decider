@@ -1,17 +1,12 @@
-import React, {Component, JSXElementConstructor} from 'react';
-import {
-  Criteria,
-  DEFAULT_HI,
-  DEFAULT_LO,
-  DEFAULT_LOC,
-  WeatherPeriod,
-  PeriodData
-} from './models'
+import React from 'react';
+import {Criteria, DEFAULT_HI, DEFAULT_LO, DEFAULT_LOC, LikeStatus, PeriodData, WeatherPeriod} from './models'
 import {AsyncStorage} from 'react-native'
 import Uuid from 'react-native-uuid'
 import axios from 'axios'
+import SafeAreaInsets from 'react-native-safe-area';
 // @ts-ignore
 import GetLocation from 'react-native-get-location';
+import SafeArea from "react-native-safe-area";
 
 const GlobalContext = React.createContext({});
 
@@ -45,16 +40,11 @@ export class GlobalState {
   public loading: boolean = false;
   public history: Array<WeatherPeriod> = [];
   public location: Location = DEFAULT_LOC;
+  public safeAreaInsets: SafeAreaInsets =
+      {top: 20, bottom: 0, left: 0, right: 0}
 }
 
 export class GlobalContextProvider extends React.Component<any, GlobalState> {
-  // state = {
-  //   currCriteria: new Criteria(),
-  //   criteriaList: [],
-  //   periods: [],
-  //   loading: false,
-  //   history: []
-  // }
   constructor(props: any) {
     super(props);
     this.state = new GlobalState()
@@ -66,32 +56,31 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
   }
   
   appInit = async() => {
+    let { safeAreaInsets } = await SafeArea.getSafeAreaInsetsForRootView();
+    this.setState({
+      safeAreaInsets
+    })
     let stored = await this.loadSavedState();
     let periods = (stored.periods || [])
       .map(v => this.toClass(v, WeatherPeriod.prototype));
     let criteriaList = (stored.criteriaList || [])
       .map(v => this.toClass(v, Criteria.prototype));
-    let currCriteria = Object.assign(
-      new Criteria,
-      stored.currCriteria);
+    let currCriteria = Object.assign(new Criteria, stored.currCriteria);
+    let history = (stored.history || [])
+      .map(v => this.toClass(v, WeatherPeriod.prototype));
+    // alert(JSON.stringify(history));
     this.setState({
       periods,
       currCriteria,
-      criteriaList
+      criteriaList,
+      history
     });
     setTimeout(async () => {
       await this.requestLocation();
-    }, 1000);
+    }, 500);
   }
   
   loadSavedState = async () => {
-    // let ret = {
-    //   currCriteria: new Criteria(),
-    //   criteriaList: [],
-    //   periods: [],
-    //   history: [],
-    //   loading: false
-    // }
     let ret = new GlobalState();
     try {
       ret.currCriteria = JSON.parse(
@@ -105,7 +94,6 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
         await AsyncStorage.getItem('history') as string) || ret.history;
     } catch (error) {
     }
-    // alert(JSON.stringify(ret));
     return ret;
   }
   
@@ -175,7 +163,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     }
     cc.maxWind = parseFloat(cc.maxWind);
     this.setState({
-      criteriaList: [...this.state.criteriaList, cc],
+      criteriaList: [cc, ...this.state.criteriaList],
       currCriteria: Criteria.fromOther(cc)
     })
     await this.saveState();
@@ -224,24 +212,55 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     })
   }
   
-  onRate = (rating: number) => {
-    let {periods, history} = this.state;
-    let fst = periods[0];
-    fst.userRating = rating;
-    let existing = history
-      .find(h => h.date === fst.date);
-    if (!existing) {
-      history = [...history, fst];
+  // onRate = (rating: number) => {
+  //   let {periods, history} = this.state;
+  //   let fst = periods[0];
+  //   fst.userRating = rating;
+  //   let existing = history
+  //     .find(h => h.date === fst.date);
+  //   if (!existing) {
+  //     history = [...history, fst];
+  //   } else {
+  //     existing.userRating = rating;
+  //   }
+  //   if (rating === -1) {
+  //     history = history.filter((h) => h !== existing);
+  //   }
+  //   this.setState({
+  //     history,
+  //     periods,
+  //   })
+  // }
+
+  setLikeStatus = async (which: LikeStatus): Promise<void> => {
+    let { periods, history } = this.state;
+    const fst = periods[0];
+    const curr = fst.likedStatus;
+    if (which === curr) {
+      fst.likedStatus = LikeStatus.NEUTRAL;
+    } else if (which === -curr) {
+      fst.likedStatus = -fst.likedStatus;
     } else {
-      existing.userRating = rating;
+      fst.likedStatus = which;
     }
-    if (rating === -1) {
-      history = history.filter((h) => h !== existing);
+    let existing = history
+        .find(h => h.date === fst.date);
+    if (!existing) {
+      history = [fst, ...history];
+    } else {
+      if (fst.likedStatus === LikeStatus.NEUTRAL ) {
+        let d = existing.date || '';
+        history = history.filter((h) =>
+            h.date !== d);
+      } else {
+        existing.likedStatus = which;
+      }
     }
     this.setState({
       history,
-      periods,
+      periods
     })
+    await this.saveState();
   }
   
   render () {
@@ -254,16 +273,10 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
           loadSavedState: this.loadSavedState,
           onChangeTemp: this.onChangeTemp,
           onChangeRain: this.onChangeRain,
-          curr: this.state.currCriteria,
-          criteriaList: this.state.criteriaList,
           addCriteria: this.addCriteria,
-          periods: this.state.periods,
-          loading: this.state.loading,
-          requestLocation: this.requestLocation,
           delCriteria: this.delCriteria,
-          onRate: this.onRate,
-          history: this.state.history,
-          appInit: this.appInit
+          appInit: this.appInit,
+          thumbPress: this.setLikeStatus,
         }}
       >
         {children}

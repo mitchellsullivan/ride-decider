@@ -14,7 +14,7 @@ export const StarButton = ({index, currIdx, onPress}: any) => {
                         }}
                         onPress={() => onPress(index)}
                         underlayColor={active ? 'goldenrod' : 'dimgray'}>
-      <IconWithBadge name='thumbs-up'
+      <IconWithBadge name='star'
                      badgeCount={0}
                      size={24}
                      color={active ? '#555' : 'whitesmoke'}/>
