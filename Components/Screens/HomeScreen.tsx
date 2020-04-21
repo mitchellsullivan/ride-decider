@@ -149,9 +149,11 @@ class HomeScreen extends React.Component<any> {
               [styles.listView, {
                 flex: 0.75,
                 justifyContent: 'center',
+                  // borderWidth: 1,
+                  // borderColor: 'white'
               }]}>
               <FlatList
-                  style={styles.scroll}
+                  style={[styles.scroll]}
                   data={periods.slice(1, 7)}
                   renderItem={({item}) => {
                     return <DayRow criteriaList={criteriaList}

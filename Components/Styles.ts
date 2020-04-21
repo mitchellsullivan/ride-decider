@@ -69,17 +69,19 @@ export const styles = StyleSheet.create({
   },
   scroll: {
     // borderRadius: 5,
-    // borderColor: 'lightgray',
-    // borderWidth: 1
+    borderTopColor: 'gray',
+    borderTopWidth: 0.25
   },
   row: {
-    height: 60,
+    // height: 60,
     marginTop: 0,
     marginBottom: 0,
     borderColor: 'gray',
-    // borderBottomWidth: 0.25,
-    paddingLeft: 15,
-    paddingRight: 15,
+    borderBottomWidth: 0.25,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
     flexDirection: 'row',
   },
 });

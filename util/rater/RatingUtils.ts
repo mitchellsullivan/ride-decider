@@ -55,7 +55,7 @@ export class RatingUtils {
         for (let i = 0; i < ratingsSize; i++) {
             let currentRowSize = ratings[i].length;
             for (let j = 0; j < currentRowSize; j++) {
-                if (ratings[i][j] === 0) continue;
+                if (ratings[i][j] == 0) continue;
                 sum += ratings[i][j];
                 counter++;
             }
@@ -69,7 +69,7 @@ export class RatingUtils {
         let counter = 0;
         let userRatingsSize = userRatings.length;
         for (let i = 0; i < userRatingsSize; i++) {
-            if (userRatings[i] === 0) continue;
+            if (userRatings[i] == 0) continue;
             sum += userRatings[i];
             counter++;
         }
