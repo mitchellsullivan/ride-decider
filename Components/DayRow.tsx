@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native'
-import {styles} from './Styles'
+import {styles} from './styles'
 import {Criteria, WeatherPeriod} from "./models";
 import Icon from "react-native-vector-icons/Feather";
 

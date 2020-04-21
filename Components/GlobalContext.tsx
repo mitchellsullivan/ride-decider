@@ -1,5 +1,5 @@
 import React from 'react';
-import {Criteria, DEFAULT_HI, DEFAULT_LO, DEFAULT_LOC, LikeStatus, PeriodData, WeatherPeriod} from './models'
+import {Criteria, DEFAULT_HI, DEFAULT_LO, DEFAULT_LOC, LikeStatus, PeriodData, WeatherPeriod} from './models';
 import {AsyncStorage} from 'react-native'
 import Uuid from 'react-native-uuid'
 import axios from 'axios'
@@ -41,7 +41,7 @@ export class GlobalState {
   public history: Array<WeatherPeriod> = [];
   public location: Location = DEFAULT_LOC;
   public safeAreaInsets: SafeAreaInsets =
-      {top: 20, bottom: 0, left: 0, right: 0}
+    {top: 20, bottom: 0, left: 0, right: 0}
 }
 
 export class GlobalContextProvider extends React.Component<any, GlobalState> {
@@ -49,12 +49,12 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     super(props);
     this.state = new GlobalState()
   }
-  
+
   toClass = (obj: any, proto: object) => {
     obj.__proto__ = proto;
     return obj;
   }
-  
+
   appInit = async() => {
     let { safeAreaInsets } = await SafeArea.getSafeAreaInsetsForRootView();
     this.setState({
@@ -79,7 +79,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       await this.requestLocation();
     }, 500);
   }
-  
+
   loadSavedState = async () => {
     let ret = new GlobalState();
     try {
@@ -96,7 +96,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     }
     return ret;
   }
-  
+
   saveState = async () => {
     const {currCriteria, periods, criteriaList, history} = this.state;
     try {
@@ -112,7 +112,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     } catch (error) {
     }
   };
-  
+
   onChangeTemp = (t: string, which: string) => {
     let currCriteria = this.state.currCriteria;
     if (which === 'hi') {
@@ -126,7 +126,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       currCriteria
     })
   }
-  
+
   populate = async (location: Location) => {
     location = location || DEFAULT_LOC;
     let long = location.longitude.toFixed(1);
@@ -152,7 +152,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       loading: false,
     });
   }
-  
+
   addCriteria = async () => {
     let cc = this.state.currCriteria;
     let min = parseFloat(String(cc.minGoodTemp) || DEFAULT_LO);
@@ -168,7 +168,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     })
     await this.saveState();
   }
-  
+
   delCriteria = (uuid: string) => {
     let criteriaList = this.state.criteriaList
       .filter(v => v.uuid !== uuid);
@@ -177,7 +177,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     });
     this.saveState();
   }
-  
+
   requestLocation = async () => {
     this.setState({
       loading: true,
@@ -196,7 +196,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     }
     await this.populate(location);
   }
-  
+
   onChangeRain = (which: string) => {
     let curr = this.state.currCriteria;
     if (which === 'curr') {
@@ -211,7 +211,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       currCriteria: curr,
     })
   }
-  
+
   // onRate = (rating: number) => {
   //   let {periods, history} = this.state;
   //   let fst = periods[0];
@@ -262,7 +262,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     })
     await this.saveState();
   }
-  
+
   render () {
     const {children} = this.props;
     return (

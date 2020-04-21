@@ -1,5 +1,5 @@
-import React from 'react';
-import {TouchableHighlight, View} from 'react-native';
+import React, {Component} from 'react';
+import {TouchableHighlight} from 'react-native';
 import {LikeStatus} from "./models";
 import Icon from 'react-native-vector-icons/Feather';
 

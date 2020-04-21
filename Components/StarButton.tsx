@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {TouchableHighlight} from 'react-native';
 import IconWithBadge from './IconWithBadge';
 
 
 export const StarButton = ({index, currIdx, onPress}: any) => {
   const active = currIdx >= index && currIdx > -1;
-  
+
   return (
     <TouchableHighlight style={{
                           backgroundColor: active ? 'gold' : 'gray',

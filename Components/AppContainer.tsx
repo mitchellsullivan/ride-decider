@@ -1,15 +1,15 @@
 import React from 'react';
 
 import {
-    NavigationContainer
+  NavigationContainer
 } from '@react-navigation/native';
 
 import {
-    createBottomTabNavigator,
+  createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
 
 import {
-    HomeScreen, RatingsScreen, CriteriaScreen
+  HomeScreen, HistoryScreen, CriteriaScreen, StatusScreen
 } from './Screens';
 import IconWithBadge from './IconWithBadge';
 
@@ -19,60 +19,64 @@ import {StatusBar, View} from "react-native";
 const Tab = createBottomTabNavigator();
 
 class AppContainer extends React.Component<any> {
-    render() {
-        const {safeAreaInsets} = this.props.global;
+  render() {
+    const {safeAreaInsets} = this.props.global;
 
-        return (
-            <>
-                <StatusBar hidden={false} barStyle={'light-content'}/>
-                <View style={{
-                    backgroundColor: '#111',
-                    height: safeAreaInsets.top
-                }}/>
-                <NavigationContainer>
-                    <Tab.Navigator screenOptions={({route}) => ({
-                        tabBarIcon: ({focused, color, size}) => {
-                            let iconName: string = '';
-                            if (route.name === 'Home') {
-                                iconName = `home`;
-                            } else if (route.name === 'Criteria') {
-                                iconName = `plus-square`;
-                            } else if (route.name === 'Ratings') {
-                                iconName = `clock`;
-                            }
-                            let colour = focused ? 'cyan' : '#eee';
-
-                            return (
-                                <IconWithBadge name={iconName}
-                                               badgeCount={0}
-                                               color={colour}
-                                               size={28}/>
-                            )
-                        },
-                    })}
-                   tabBarOptions={{
-                       activeBackgroundColor: 'black',
-                       inactiveBackgroundColor: 'black',
-                       showLabel: false,
-                       keyboardHidesTabBar: false,
-                       style:{
-                           borderBottomWidth: 0,
-                           borderTopWidth: 0.25,
-                           borderTopColor: 'gray'
-                       }
-                   }}>
-                        <Tab.Screen name="Home" component={HomeScreen}/>
-                        <Tab.Screen name="Criteria" component={CriteriaScreen}/>
-                        <Tab.Screen name="Ratings" component={RatingsScreen}/>
-                    </Tab.Navigator>
-                    <View style={{
-                        backgroundColor: '#111',
-                        height: safeAreaInsets.bottom
-                    }}/>
-                </NavigationContainer>
-            </>
-        )
+    const tabBarOptions = {
+      activeBackgroundColor: 'black',
+      inactiveBackgroundColor: 'black',
+      showLabel: false,
+      keyboardHidesTabBar: false,
+      style:{
+        borderBottomWidth: 0,
+        borderTopWidth: 0.25,
+        borderTopColor: 'gray'
+      }
     }
+
+    const screenOpts = ({route}: any) => {
+      return {
+        tabBarIcon: ({focused, color, size}: any) => {
+          let icons: { [key: string]: string } = {
+            'Home': 'home',
+            'Criteria': 'plus-square',
+            'History': 'clock',
+            'Status': 'info',
+          }
+          let iconName = icons[route.name] || 'frown';
+          let colour = focused ? 'cyan' : '#eee';
+          return (
+            <IconWithBadge name={iconName} badgeCount={0} color={colour} size={28}/>
+          )
+        },
+      }
+    }
+
+
+
+    return (
+      <>
+        <StatusBar hidden={false} barStyle={'light-content'}/>
+        <View style={{
+          backgroundColor: '#111',
+          height: safeAreaInsets.top
+        }}/>
+        <NavigationContainer>
+          <Tab.Navigator screenOptions={(r) => screenOpts(r)}
+             tabBarOptions={tabBarOptions}>
+            <Tab.Screen name="Home" component={HomeScreen}/>
+            <Tab.Screen name="Criteria" component={CriteriaScreen}/>
+            <Tab.Screen name="History" component={HistoryScreen}/>
+            <Tab.Screen name="Status" component={StatusScreen}/>
+          </Tab.Navigator>
+          <View style={{
+            backgroundColor: '#111',
+            height: safeAreaInsets.bottom
+          }}/>
+        </NavigationContainer>
+      </>
+    )
+  }
 }
 
 export default withGlobalContext(AppContainer);

@@ -1,3 +1,4 @@
+import React from 'react';
 import {RatingUtils} from "./RatingUtils";
 
 class MyPair<K, V> {

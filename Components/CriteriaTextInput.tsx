@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react';
 import {Keyboard, Text, TextInput, View, StyleSheet} from 'react-native'
 
 type CriteriaTextInputProps = {

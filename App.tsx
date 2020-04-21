@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {Component} from 'react';
+import 'react-native';
 
 import {GlobalContextProvider} from './Components/GlobalContext';
 import AppContainer from "./Components/AppContainer";
 
-export default class App extends React.Component {
+export default class App extends Component {
   render() {
     return (
       <GlobalContextProvider>
@@ -12,4 +13,3 @@ export default class App extends React.Component {
     )
   }
 }
-

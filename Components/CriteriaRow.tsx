@@ -1,6 +1,6 @@
-import React from 'react';
-import {Text, TouchableOpacity, TouchableHighlight, View} from 'react-native'
-import {styles} from './Styles'
+import React, {Component} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native';
+import {styles} from './styles'
 import IconWithBadge from './IconWithBadge'
 import {Criteria} from './models';
 
