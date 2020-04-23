@@ -2,6 +2,8 @@ import React from 'react';
 import Uuid from 'react-native-uuid';
 
 import {byPoints} from '../data/forecast'
+import {descs} from "../data/descs";
+import {CollaborativeFilter, PredictedRatings} from "../util/CollaborativeFilter";
 
 export const DEFAULT_HI = '72';
 export const DEFAULT_LO = '60';
@@ -24,7 +26,8 @@ export type PeriodData = {
   windDirection: string,
   icon: string,
   shortForecast: string,
-  detailedForecast: string
+  detailedForecast: string,
+  likedStatus: number
 }
 
 export class Criteria {
@@ -88,6 +91,14 @@ export class WeatherPeriod {
   public get isDaytime(): boolean { return this.pData.isDaytime}
   public get name(): string { return this.pData.name };
 
+  public get xtrashortfc(): string {
+    let icon = this.pData.icon;
+    let spl: string = icon.split(/[\/,?]/g)[6];
+    return descs[spl].split(/\s+\(/g)[0];
+  }
+
+  public abbr: string;
+
   public get date(): string {
     return this.pData.startTime.substring(0, 10);
   }
@@ -96,12 +107,12 @@ export class WeatherPeriod {
         .some(w => this.shortForecast.toLowerCase().includes(w));
   }
 
+  public prediction: PredictedRatings = new PredictedRatings();
+
   public hiWind: number;
   public loWind: number;
   public windString: string;
   public wasYesterdayRainy: boolean = false;
-  public userRating: number = -1;
-
   public likedStatus: LikeStatus = LikeStatus.NEUTRAL;
 
   constructor(public pData: PeriodData) {
@@ -112,6 +123,9 @@ export class WeatherPeriod {
       .split(' to ');
     this.loWind = parseFloat(winds[0]);
     this.hiWind = winds.length < 2 ? this.loWind : parseFloat(winds[1]);
+    let icon = this.pData.icon;
+    this.abbr = icon.split(/[\/,?]/g)[6];
+    this.likedStatus = pData.likedStatus;
   }
 
   getDisplayString() {
@@ -119,5 +133,14 @@ export class WeatherPeriod {
       `${this.loWind}` +
       `${this.hiWind === this.loWind ? '' : ' to ' + this.hiWind}` +
       ` mph\n${this.shortForecast}`;
+  }
+
+  public setPredictedGoodness(history: WeatherPeriod[]) {
+    this.prediction = CollaborativeFilter.predict(history, this);
+    // console.log(this.prediction);
+  }
+
+  public get forHistory(): any {
+    return {}
   }
 }

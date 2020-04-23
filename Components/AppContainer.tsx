@@ -57,10 +57,7 @@ class AppContainer extends React.Component<any> {
     return (
       <>
         <StatusBar hidden={false} barStyle={'light-content'}/>
-        <View style={{
-          backgroundColor: '#111',
-          height: safeAreaInsets.top
-        }}/>
+        <View style={{backgroundColor: '#111', height: safeAreaInsets.top}}/>
         <NavigationContainer>
           <Tab.Navigator screenOptions={(r) => screenOpts(r)}
              tabBarOptions={tabBarOptions}>
@@ -69,10 +66,7 @@ class AppContainer extends React.Component<any> {
             <Tab.Screen name="History" component={HistoryScreen}/>
             <Tab.Screen name="Status" component={StatusScreen}/>
           </Tab.Navigator>
-          <View style={{
-            backgroundColor: '#111',
-            height: safeAreaInsets.bottom
-          }}/>
+          <View style={{backgroundColor: '#111', height: safeAreaInsets.bottom}}/>
         </NavigationContainer>
       </>
     )

@@ -6,7 +6,7 @@ class MyPair<K, V> {
                 public second: V) {}
 }
 
-export class Rating {
+export class Recommender {
     public static getRatingPrediction(ratings: Array<Array<number>>,
                                       rowIndex: number,
                                       colIndex: number, ) {

@@ -1,4 +1,4 @@
-import React from 'react';
+
 export class RatingUtils {
     public static calculateDotProduct(a: Array<number>, b: Array<number>): number {
         let sum = 0;

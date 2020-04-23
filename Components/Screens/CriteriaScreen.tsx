@@ -43,9 +43,9 @@ class CriteriaScreen extends Component<any> {
         <Text style={ss.noData}>(No criteria set.)</Text>
       </View>
     ) : (
-      <View style={[styles.listView, {flex: 0.75, width: 400}]}>
+      <View style={[styles.listView, {flex: 0.75, width: '100%', flexDirection: 'row'}]}>
         <KeyboardAwareFlatList
-          style={[]}
+          style={{flex: 1}}
           data={criteriaList}
           renderItem={({item}) =>
             <CriteriaRow delCriteria={delCriteria}
@@ -127,9 +127,13 @@ const ss = StyleSheet.create({
   noData: {
     textAlign: 'center',
     fontSize: 20,
-    marginTop: 20
+    marginTop: 20,
+    color: 'white'
   },
-  noDataView: {flex: 0.75, backgroundColor: 'lightgray', width: 350},
+  noDataView: {flex: 0.75,
+    backgroundColor: 'black',
+    flexDirection: 'column',
+    justifyContent: 'center'},
   kav: {flex: 1, padding: 0, margin: 0, alignItems: 'center'},
 
 })

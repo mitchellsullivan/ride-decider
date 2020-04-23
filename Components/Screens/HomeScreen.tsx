@@ -14,6 +14,7 @@ import {DayRow} from '../DayRow';
 import {withGlobalContext} from '../GlobalContext';
 import {ThumbButton} from "../ThumbButton";
 import {LikeStatus} from "../models";
+import {CollaborativeFilter} from "../../util/CollaborativeFilter";
 
 class HomeScreen extends Component<any> {
   static navigationOptions = ({navigation}: any) => {
@@ -30,6 +31,7 @@ class HomeScreen extends Component<any> {
     const {
       loading,
       requestLocation,
+      city
     } = this.props.global;
 
     return (
@@ -46,28 +48,29 @@ class HomeScreen extends Component<any> {
         <View style={{flex: 1}}>
           <Text style={styles.headingText}>Weather</Text>
         </View>
-        <View style={{flex: 1}}>
-          {loading ? <ActivityIndicator style={ss.spinner}/> : null}
+        <View style={{flex: 1, alignItems: 'center'}}>
+          {loading ? (<ActivityIndicator style={ss.spinner}/>) :
+            (<Text style={{color: 'lightgray', }}>{city}</Text>)}
         </View>
       </View>
     )
   }
 
   renderToday = () => {
-    let {periods} = this.props.global;
-    if (periods.length > 0) {
-      const today = periods[0];
-      return (
-        <View style={[ss.todayView]}>
-          <Text style={ss.dayText}>{today.name}</Text>
-          <Text style={ss.temperatureText}>{today.temp}{'\u00b0'}{'F'}</Text>
-          <Text style={ss.windText}>{today.windString}</Text>
-          <Text style={ss.shortForecastText}>
-            {today.shortForecast}
-          </Text>
-        </View>
-      )
-    }
+    let {periods, todayRatings} = this.props.global;
+    if (periods.length == 0) return <View style={ss.todayView}/>;
+    const today = periods[0];
+    return (
+      <View style={[ss.todayView]}>
+        <Text style={ss.dayText}>{today.name}</Text>
+        <Text style={ss.temperatureText}>{today.temp}{'\u00b0'}{'F'}</Text>
+        <Text style={ss.windText}>{today.windString}</Text>
+        <Text style={ss.shortForecastText}>{today.xtrashortfc}</Text>
+        <Text style={ss.predictText}>Temp: {today.prediction.tempRatingStr}</Text>
+        <Text style={ss.predictText}>Sky: {today.prediction.skyRatingStr}</Text>
+        <Text style={ss.predictText}>Wind: {today.prediction.windRatingStr}</Text>
+      </View>
+    )
   }
 
   renderLikeButtons = () => {
@@ -169,8 +172,9 @@ const ss = StyleSheet.create({
   windText: {fontSize: 20, color: 'white'},
   indication: {},
   todayView: {
-    borderWidth: 0,
-    paddingTop: 10,
+    // borderWidth: 1,
+    // borderColor: 'white',
+    paddingTop: 5,
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
@@ -179,7 +183,7 @@ const ss = StyleSheet.create({
   topArea: {
     flex: 0.25,
     flexDirection: 'row',
-    width: '100%'
+    width: '100%',
   },
   likeButtons: {
     borderWidth: 0,
@@ -208,6 +212,10 @@ const ss = StyleSheet.create({
     marginTop: 20,
     color: 'white'
   },
+  predictText: {
+    color: 'white',
+    fontSize: 12,
+  }
 })
 
 export default withGlobalContext(HomeScreen);

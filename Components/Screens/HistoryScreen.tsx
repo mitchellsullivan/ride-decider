@@ -46,7 +46,7 @@ class HistoryScreen extends Component<any> {
             style={styles.scroll}
             data={history}
             renderItem={({item}) => <HistoryRow item={item}/>}
-            keyExtractor={({name}) => name}
+            keyExtractor={({item}, i) => item.name + i}
           />
         )}
       </View>

@@ -173,7 +173,7 @@ export const forecastJackson = {
             "windDirection": "ENE",
             "icon": "https://api.weather.gov/icons/land/night/few?size=medium",
             "shortForecast": "Mostly Clear",
-            "detailedForecast": "Mostly clear, with a low around 44. East northeast wind 0 to 5 mph."
+            "detailedForecast": "Mostly CLEAR, with a low around 44. East northeast wind 0 to 5 mph."
           },
           {
             "number": 2,
@@ -188,7 +188,8 @@ export const forecastJackson = {
             "windDirection": "SE",
             "icon": "https://api.weather.gov/icons/land/day/few?size=medium",
             "shortForecast": "Sunny",
-            "detailedForecast": "Sunny, with a high near 75. Southeast wind 5 to 10 mph."
+            "detailedForecast": "Sunny, with a high near 75. Southeast wind 5 to 10 mph.",
+            "likedStatus": 1
           },
           {
             "number": 3,
@@ -203,7 +204,7 @@ export const forecastJackson = {
             "windDirection": "SE",
             "icon": "https://api.weather.gov/icons/land/night/tsra,40/tsra,90?size=medium",
             "shortForecast": "Slight Chance Showers And Thunderstorms then Showers And Thunderstorms",
-            "detailedForecast": "A slight chance of showers and thunderstorms between 7pm and 8pm, then showers and thunderstorms. Mostly cloudy, with a low around 62. Southeast wind around 5 mph. Chance of precipitation is 90%. New rainfall amounts between a half and three quarters of an inch possible."
+            "detailedForecast": "A slight chance of showers and thunderstorms between 7pm and 8pm, then showers and thunderstorms. Mostly CLOUDY, with a low around 62. Southeast wind around 5 mph. Chance of precipitation is 90%. New rainfall amounts between a half and three quarters of an inch possible."
           },
           {
             "number": 4,
@@ -218,7 +219,8 @@ export const forecastJackson = {
             "windDirection": "S",
             "icon": "https://api.weather.gov/icons/land/day/tsra,100?size=medium",
             "shortForecast": "Showers And Thunderstorms",
-            "detailedForecast": "Showers and thunderstorms. Some of the storms could be severe. Cloudy, with a high near 80. South wind 5 to 15 mph, with gusts as high as 25 mph. Chance of precipitation is 100%. New rainfall amounts between 1 and 2 inches possible."
+            "detailedForecast": "Showers and thunderstorms. Some of the storms could be severe. Cloudy, with a high near 80. South wind 5 to 15 mph, with gusts as high as 25 mph. Chance of precipitation is 100%. New rainfall amounts between 1 and 2 inches possible.",
+            "likedStatus": -1
           },
           {
             "number": 5,
@@ -233,7 +235,7 @@ export const forecastJackson = {
             "windDirection": "WSW",
             "icon": "https://api.weather.gov/icons/land/night/tsra_hi,60/sct?size=medium",
             "shortForecast": "Showers And Thunderstorms Likely then Partly Cloudy",
-            "detailedForecast": "Showers and thunderstorms likely before 7pm, then a chance of showers and thunderstorms between 7pm and midnight. Some of the storms could be severe. Partly cloudy, with a low around 55. West southwest wind 5 to 15 mph, with gusts as high as 25 mph. Chance of precipitation is 60%. New rainfall amounts between a half and three quarters of an inch possible."
+            "detailedForecast": "Showers and thunderstorms likely before 7pm, then a chance of showers and thunderstorms between 7pm and midnight. Some of the storms could be severe. Partly CLOUDY, with a low around 55. West southwest wind 5 to 15 mph, with gusts as high as 25 mph. Chance of precipitation is 60%. New rainfall amounts between a half and three quarters of an inch possible."
           },
           {
             "number": 6,
@@ -248,7 +250,8 @@ export const forecastJackson = {
             "windDirection": "NW",
             "icon": "https://api.weather.gov/icons/land/day/sct?size=medium",
             "shortForecast": "Mostly Sunny",
-            "detailedForecast": "Mostly sunny, with a high near 66. Northwest wind 5 to 10 mph, with gusts as high as 20 mph."
+            "detailedForecast": "Mostly sunny, with a high near 66. Northwest wind 5 to 10 mph, with gusts as high as 20 mph.",
+            "likedStatus": 1
           },
           {
             "number": 7,
@@ -263,7 +266,7 @@ export const forecastJackson = {
             "windDirection": "N",
             "icon": "https://api.weather.gov/icons/land/night/few?size=medium",
             "shortForecast": "Mostly Clear",
-            "detailedForecast": "Mostly clear, with a low around 44. North wind around 5 mph, with gusts as high as 20 mph."
+            "detailedForecast": "Mostly CLEAR, with a low around 44. North wind around 5 mph, with gusts as high as 20 mph."
           },
           {
             "number": 8,
@@ -278,7 +281,8 @@ export const forecastJackson = {
             "windDirection": "NE",
             "icon": "https://api.weather.gov/icons/land/day/few?size=medium",
             "shortForecast": "Sunny",
-            "detailedForecast": "Sunny, with a high near 66. Northeast wind 5 to 10 mph, with gusts as high as 20 mph."
+            "detailedForecast": "Sunny, with a high near 66. Northeast wind 5 to 10 mph, with gusts as high as 20 mph.",
+            "likedStatus": 1
           },
           {
             "number": 9,
@@ -293,7 +297,7 @@ export const forecastJackson = {
             "windDirection": "NNE",
             "icon": "https://api.weather.gov/icons/land/night/bkn?size=medium",
             "shortForecast": "Mostly Cloudy",
-            "detailedForecast": "Mostly cloudy, with a low around 42. North northeast wind around 5 mph."
+            "detailedForecast": "Mostly CLOUDY, with a low around 42. North northeast wind around 5 mph."
           },
           {
             "number": 10,
@@ -308,7 +312,8 @@ export const forecastJackson = {
             "windDirection": "N",
             "icon": "https://api.weather.gov/icons/land/day/sct?size=medium",
             "shortForecast": "Mostly Sunny",
-            "detailedForecast": "Mostly sunny, with a high near 66."
+            "detailedForecast": "Mostly sunny, with a high near 66.",
+            "likedStatus": 1
           },
           {
             "number": 11,
@@ -323,7 +328,7 @@ export const forecastJackson = {
             "windDirection": "NNE",
             "icon": "https://api.weather.gov/icons/land/night/bkn?size=medium",
             "shortForecast": "Mostly Cloudy",
-            "detailedForecast": "Mostly cloudy, with a low around 45."
+            "detailedForecast": "Mostly CLOUDY, with a low around 45."
           },
           {
             "number": 12,
@@ -338,7 +343,8 @@ export const forecastJackson = {
             "windDirection": "ENE",
             "icon": "https://api.weather.gov/icons/land/day/sct?size=medium",
             "shortForecast": "Mostly Sunny",
-            "detailedForecast": "Mostly sunny, with a high near 72."
+            "detailedForecast": "Mostly sunny, with a high near 72.",
+            "likedStatus": 1
           },
           {
             "number": 13,
@@ -353,7 +359,7 @@ export const forecastJackson = {
             "windDirection": "E",
             "icon": "https://api.weather.gov/icons/land/night/bkn?size=medium",
             "shortForecast": "Mostly Cloudy",
-            "detailedForecast": "Mostly cloudy, with a low around 50."
+            "detailedForecast": "Mostly CLOUDY, with a low around 50."
           },
           {
             "number": 14,
@@ -368,7 +374,8 @@ export const forecastJackson = {
             "windDirection": "NE",
             "icon": "https://api.weather.gov/icons/land/day/sct?size=medium",
             "shortForecast": "Mostly Sunny",
-            "detailedForecast": "Mostly sunny, with a high near 76."
+            "detailedForecast": "Mostly sunny, with a high near 76.",
+            "likedStatus": 1
           }
         ]
       }

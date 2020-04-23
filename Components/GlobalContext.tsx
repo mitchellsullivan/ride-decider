@@ -1,12 +1,27 @@
 import React from 'react';
-import {Criteria, DEFAULT_HI, DEFAULT_LO, DEFAULT_LOC, LikeStatus, PeriodData, WeatherPeriod} from './models';
+import {
+  Criteria,
+  DEFAULT_HI,
+  DEFAULT_LO,
+  DEFAULT_LOC,
+  LikeStatus,
+  PeriodData,
+  WeatherPeriod
+} from './models';
 import {AsyncStorage} from 'react-native'
 import Uuid from 'react-native-uuid'
-import axios from 'axios'
+import axios from 'axios';
 import SafeAreaInsets from 'react-native-safe-area';
 // @ts-ignore
 import GetLocation from 'react-native-get-location';
 import SafeArea from "react-native-safe-area";
+
+import {
+  PredictedRatings,
+  CollaborativeFilter
+} from '../util/CollaborativeFilter';
+import {DUMMY_DAYS} from "../data/dummyDays";
+import {forecastJackson} from "../data/forecast";
 
 const GlobalContext = React.createContext({});
 
@@ -18,7 +33,13 @@ interface Location {
 type ByPointsData = {
   data: {
     properties: {
-      forecast: string
+      forecast: string,
+      relativeLocation: {
+        properties: {
+          city: string
+          state: string
+        }
+      }
     }
   }
 }
@@ -42,6 +63,8 @@ export class GlobalState {
   public location: Location = DEFAULT_LOC;
   public safeAreaInsets: SafeAreaInsets =
     {top: 20, bottom: 0, left: 0, right: 0}
+  public city: string = 'Loading...';
+  public todayRatings = new PredictedRatings();
 }
 
 export class GlobalContextProvider extends React.Component<any, GlobalState> {
@@ -60,24 +83,37 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     this.setState({
       safeAreaInsets
     })
+    // LOAD
     let stored = await this.loadSavedState();
-    let periods = (stored.periods || [])
+    // SET
+    let periods: WeatherPeriod[] = (stored.periods || [])
       .map(v => this.toClass(v, WeatherPeriod.prototype));
-    let criteriaList = (stored.criteriaList || [])
+    let criteriaList: Criteria[] = (stored.criteriaList || [])
       .map(v => this.toClass(v, Criteria.prototype));
-    let currCriteria = Object.assign(new Criteria, stored.currCriteria);
-    let history = (stored.history || [])
-      .map(v => this.toClass(v, WeatherPeriod.prototype));
-    // alert(JSON.stringify(history));
+    let currCriteria: Criteria = Object.assign(new Criteria(), stored.currCriteria);
+    // let history = (stored.history || [])
+    //   .map(v => this.toClass(v, WeatherPeriod.prototype));
+    // let history = DUMMY_DAYS;
+    let history = forecastJackson.data.properties.periods
+      .map((p: any) => new WeatherPeriod(p))
+      .filter(p => p.isDaytime);
+
+    // console.log(history);
+    for (let p of periods) {
+      p.setPredictedGoodness(history);
+      console.log(p.prediction)
+    }
+
     this.setState({
       periods,
       currCriteria,
       criteriaList,
       history
     });
+
     setTimeout(async () => {
-      await this.requestLocation();
-    }, 500);
+      await this.requestLocation(history);
+    }, 250);
   }
 
   loadSavedState = async () => {
@@ -92,23 +128,20 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
         await AsyncStorage.getItem('criteriaList') as string) || ret.criteriaList;
       ret.history = JSON.parse(
         await AsyncStorage.getItem('history') as string) || ret.history;
+
+      // alert(JSON.stringify(ret.history));
     } catch (error) {
     }
     return ret;
   }
 
   saveState = async () => {
-    const {currCriteria, periods, criteriaList, history} = this.state;
+    const {periods, history} = this.state;
     try {
-      await AsyncStorage.setItem(
-        'curr', JSON.stringify(currCriteria));
       await AsyncStorage.setItem(
         'periods', JSON.stringify(periods));
       await AsyncStorage.setItem(
-        'criteriaList', JSON.stringify(criteriaList));
-      await AsyncStorage.setItem(
-        'history', JSON.stringify(history)
-      )
+        'history', JSON.stringify(history));
     } catch (error) {
     }
   };
@@ -127,7 +160,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     })
   }
 
-  populate = async (location: Location) => {
+  fetchData = async (location: Location, history: WeatherPeriod[]) => {
     location = location || DEFAULT_LOC;
     let long = location.longitude.toFixed(1);
     let lat = location.latitude.toFixed(1);
@@ -143,13 +176,24 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
         a[i + 1].wasYesterdayRainy = true;
       }
     })
-    if (periods.length === 0) {
-      periods = this.state.periods
+    if (periods.length > 0 && history.length > 0) {
+      let alreadyThere = history[0];
+      if (periods[0].date == alreadyThere.date) {
+        periods[0].likedStatus = alreadyThere.likedStatus;
+      }
     }
+    for (let p of periods) {
+      p.setPredictedGoodness(history);
+    }
+    // for (let p of periods) {
+    //   p.predictedGoodness = CollaborativeFilter.predict(history, p);
+    // }
+    let {city, state} = data.data.properties.relativeLocation.properties;
     this.setState({
       location,
       periods,
       loading: false,
+      city: `${city}, ${state}`,
     });
   }
 
@@ -166,7 +210,10 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       criteriaList: [cc, ...this.state.criteriaList],
       currCriteria: Criteria.fromOther(cc)
     })
-    await this.saveState();
+    await AsyncStorage.setItem(
+      'curr', JSON.stringify(this.state.currCriteria));
+    await AsyncStorage.setItem(
+      'criteriaList', JSON.stringify(this.state.criteriaList));
   }
 
   delCriteria = (uuid: string) => {
@@ -178,7 +225,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     this.saveState();
   }
 
-  requestLocation = async () => {
+  requestLocation = async (history: WeatherPeriod[]) => {
     this.setState({
       loading: true,
       location: {latitude: 0, longitude: 0}
@@ -194,7 +241,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
         loading: false,
       });
     }
-    await this.populate(location);
+    await this.fetchData(location, history);
   }
 
   onChangeRain = (which: string) => {
@@ -212,30 +259,11 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     })
   }
 
-  // onRate = (rating: number) => {
-  //   let {periods, history} = this.state;
-  //   let fst = periods[0];
-  //   fst.userRating = rating;
-  //   let existing = history
-  //     .find(h => h.date === fst.date);
-  //   if (!existing) {
-  //     history = [...history, fst];
-  //   } else {
-  //     existing.userRating = rating;
-  //   }
-  //   if (rating === -1) {
-  //     history = history.filter((h) => h !== existing);
-  //   }
-  //   this.setState({
-  //     history,
-  //     periods,
-  //   })
-  // }
-
   setLikeStatus = async (which: LikeStatus): Promise<void> => {
     let { periods, history } = this.state;
     const fst = periods[0];
     const curr = fst.likedStatus;
+
     if (which === curr) {
       fst.likedStatus = LikeStatus.NEUTRAL;
     } else if (which === -curr) {
@@ -243,12 +271,13 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     } else {
       fst.likedStatus = which;
     }
+
     let existing = history
         .find(h => h.date === fst.date);
     if (!existing) {
       history = [fst, ...history];
     } else {
-      if (fst.likedStatus === LikeStatus.NEUTRAL ) {
+      if (fst.likedStatus == LikeStatus.NEUTRAL ) {
         let d = existing.date || '';
         history = history.filter((h) =>
             h.date !== d);
@@ -260,7 +289,9 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       history,
       periods
     })
-    await this.saveState();
+    // await this.saveState();
+    await AsyncStorage.setItem('history', JSON.stringify(history));
+    // alert('saved! \n' + (await AsyncStorage.getItem('history')));
   }
 
   render () {
