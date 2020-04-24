@@ -38,10 +38,10 @@ class AppContainer extends React.Component<any> {
       return {
         tabBarIcon: ({focused, color, size}: any) => {
           let icons: { [key: string]: string } = {
-            'Home': 'home',
-            'Criteria': 'plus-square',
+            'Home': 'sun',
+            'Criteria': 'plus-circle',
             'History': 'clock',
-            'Status': 'info',
+            'Debug': 'info',
           }
           let iconName = icons[route.name] || 'frown';
           let colour = focused ? 'cyan' : '#eee';
@@ -64,7 +64,7 @@ class AppContainer extends React.Component<any> {
             <Tab.Screen name="Home" component={HomeScreen}/>
             <Tab.Screen name="Criteria" component={CriteriaScreen}/>
             <Tab.Screen name="History" component={HistoryScreen}/>
-            <Tab.Screen name="Status" component={StatusScreen}/>
+            <Tab.Screen name="Debug" component={StatusScreen}/>
           </Tab.Navigator>
           <View style={{backgroundColor: '#111', height: safeAreaInsets.bottom}}/>
         </NavigationContainer>

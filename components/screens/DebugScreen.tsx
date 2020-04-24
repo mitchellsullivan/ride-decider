@@ -9,10 +9,10 @@ import {styles} from '../Styles'
 import {SafeAreaView} from 'react-navigation'
 import {withGlobalContext} from '../GlobalContext'
 
-class StatusScreen extends Component<any> {
+class DebugScreen extends Component<any> {
   static navigationOptions = ({navigation}: any) => {
     return {
-      title: 'Status',
+      title: 'Debug',
     };
   };
 
@@ -37,6 +37,7 @@ class StatusScreen extends Component<any> {
     let {dummyHistoryOn} = this.state;
     return (
       <View style={[ss.emptyListContainer, {alignItems: 'center'}]}>
+        <View style={{height: 15}}/>
         <Text style={{color: 'white'}}>Your Location: {city}</Text>
         <View style={{height: 50}}/>
         <TouchableHighlight style={{
@@ -55,7 +56,7 @@ class StatusScreen extends Component<any> {
           })
         }} underlayColor={'gray'}>
           <Text style={ss.noDaysText}>{dummyHistoryOn ?
-            'Remove Dummy Days' : 'Append Dummy Days'}
+            'Remove Dummy History' : 'Add Dummy History'}
           </Text>
         </TouchableHighlight>
       </View>
@@ -83,10 +84,10 @@ const ss = StyleSheet.create({
   },
   noDaysText: {
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 16,
     color: 'white',
     paddingTop: 0
   }
 });
 
-export default withGlobalContext(StatusScreen);
+export default withGlobalContext(DebugScreen);

@@ -49,4 +49,55 @@ export class Criteria {
       `Rain: ${this.rainOkay ? 'OK' : 'NO'}, ` +
       `Wind: ${this.maxWind} mph`;
   }
+
+  public correctEmpty(): boolean {
+    let corrected = false;
+    if (String(this.maxWind).trim() == '') {
+      this.maxWind = '50';
+      corrected = true;
+    }
+    if (String(this.maxGoodTemp).trim() == '') {
+      this.maxGoodTemp = DEFAULT_HI;
+      corrected = true;
+    }
+    if (String(this.minGoodTemp).trim() == '') {
+      this.minGoodTemp = DEFAULT_LO;
+      corrected = true;
+    }
+    return corrected;
+  }
+
+  public correctHiLoMixup(cb: Function) {
+    let min = parseFloat(
+      String(this.minGoodTemp) || DEFAULT_LO);
+    let max = parseFloat(
+      String(this.maxGoodTemp) || DEFAULT_HI);
+    if (min > max) {
+      this.minGoodTemp = max;
+      this.maxGoodTemp = min;
+    }
+    this.maxWind = parseFloat(this.maxWind || '50');
+    cb(this);
+  }
+
+  public onToggleRain(which: string) {
+    if (which === 'curr') {
+      this.rainOkay = !this.rainOkay;
+      if (this.rainOkay) this.prevDayRainOkay = true;
+    }
+    if (which === 'prev') {
+      this.prevDayRainOkay = !this.prevDayRainOkay;
+    }
+  }
+
+  public onTextInput(t: string, which: string, cb: Function) {
+    if (which === 'hi') {
+      this.maxGoodTemp = t;
+    } else if (which === 'lo') {
+      this.minGoodTemp = t;
+    } else if (which === 'mw') {
+      this.maxWind = t;
+    }
+    cb(this);
+  }
 }

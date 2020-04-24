@@ -11,9 +11,9 @@ type CriteriaRowProps = {
 
 export const CriteriaRow = ({delCriteria, item}: CriteriaRowProps) => {
   return (
-      <View style={[styles.row, {flexDirection: 'row', padding: 10}]}>
+      <View style={[styles.row, {flexDirection: 'row'}]}>
         <View style={{flex: 1, flexDirection: 'column'}}>
-          <View>
+          <View style={{paddingTop: 10}}>
             <Text style={{fontSize: 13, color: 'white'}}>
               {item.getDisplayString()}
             </Text>

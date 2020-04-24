@@ -3,14 +3,14 @@ import {Keyboard, Text, TextInput, View, StyleSheet} from 'react-native'
 
 type CriteriaTextInputProps = {
   label: string,
-  saveState: () => void,
+  saveCriteria: () => void,
   onChangeCriteriaTxtBox: Function,
   which: string,
   val: any
 }
 
 export const CriteriaTextInput = (props: CriteriaTextInputProps) => {
-  const {label, saveState, onChangeCriteriaTxtBox, which, val} = props;
+  const {label, saveCriteria, onChangeCriteriaTxtBox, which, val} = props;
   return (
     <View style={{flex: 1}}>
       <Text style={{fontSize: 14, color: 'white'}}>{label}</Text>
@@ -21,7 +21,7 @@ export const CriteriaTextInput = (props: CriteriaTextInputProps) => {
                  returnKeyType='done'
                  onSubmitEditing={async () => {
                    Keyboard.dismiss();
-                   await saveState();
+                   await saveCriteria();
                  }}
                  onChangeText={(text) =>
                    onChangeCriteriaTxtBox(text, which)}

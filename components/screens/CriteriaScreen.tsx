@@ -58,11 +58,8 @@ class CriteriaScreen extends Component<any> {
   renderTextInput = (label: string, which: string, val: number) => {
     let {saveCriteria, onChangeCriteriaTxtBox} = this.props.global;
     return (
-      <CriteriaTextInput label={label}
-                         saveState={saveCriteria}
-                         onChangeCriteriaTxtBox={onChangeCriteriaTxtBox}
-                         which={which}
-                         val={val}/>
+      <CriteriaTextInput {
+        ...{label, which, val, onChangeCriteriaTxtBox, saveCriteria}}/>
     )
   }
 
