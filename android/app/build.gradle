@@ -157,9 +157,6 @@ android {
 
         release {
             storeFile file('android.keystore')
-            storePassword 'Thequickbrownfoxjumpsoverthelazydog'
-            keyAlias 'android'
-            keyPassword 'Thequickbrownfoxjumpsoverthelazydog'
 //            storePassword readLine("\nKeystore password:")
 //            keyAlias System.console.readLine("\nAlias: ")
 //            keyPassword java.io.console.readLine("\nAlias password: ")
