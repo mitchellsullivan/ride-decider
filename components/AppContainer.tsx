@@ -9,7 +9,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 
 import {
-  HomeScreen, HistoryScreen, CriteriaScreen, StatusScreen
+  HomeScreen, HistoryScreen, CriteriaScreen, DebugScreen
 } from './screens';
 import IconWithBadge from './IconWithBadge';
 
@@ -64,7 +64,7 @@ class AppContainer extends React.Component<any> {
             <Tab.Screen name="Home" component={HomeScreen}/>
             <Tab.Screen name="Criteria" component={CriteriaScreen}/>
             <Tab.Screen name="History" component={HistoryScreen}/>
-            <Tab.Screen name="Debug" component={StatusScreen}/>
+            <Tab.Screen name="Debug" component={DebugScreen}/>
           </Tab.Navigator>
           <View style={{backgroundColor: '#111', height: safeAreaInsets.bottom}}/>
         </NavigationContainer>

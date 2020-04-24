@@ -127,7 +127,7 @@ class HomeScreen extends Component<any> {
     const today = periods[0];
     return (
       <>
-        <Text style={[ss.predictText, {paddingTop: 5, fontSize: 12}]}>Like Prediction</Text>
+        <Text style={[ss.predictText, {paddingTop: 5, fontSize: 12}]}>Like Prediction %</Text>
         <View style={ss.predictView}>
           <View style={{flex: 1}}>
             <Text style={ss.predictText}>Temp:</Text>

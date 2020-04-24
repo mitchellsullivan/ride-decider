@@ -7,6 +7,7 @@ export default class Historian {
     if (periods.length > 0 && history.length > 0) {
       if (periods[0].date == history[0].date) {
         periods[0].likedStatus = history[0].likedStatus;
+        history[0] = periods[0];
       }
     }
   }

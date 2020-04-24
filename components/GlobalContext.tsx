@@ -27,7 +27,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     })
     let {history, periods, currCriteria, criteriaList} = await Persister.loadInit()
     history = Historian.doDummies(history, 'rem');
-    this.setPredictions(periods, history);
+    GlobalContextProvider._setPredictions(periods, history);
 
     this.setState({
       periods,
@@ -39,13 +39,13 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     setTimeout(async () => {
       let location = await this.requestLocation();
       await this.onFetchData(location, history);
-    }, 250);
+    }, 200);
   }
 
-  adjustDummyHistory = async (isDummyHistoryOn: boolean): Promise<void> => {
+  onDummyHistoryPressed = async (isDummyHistoryOn: boolean): Promise<void> => {
     let {history, periods} = this.state;
     history = Historian.doDummies(history, isDummyHistoryOn ? 'rem' : 'add');
-    this.setPredictions(periods, history);
+    GlobalContextProvider._setPredictions(periods, history);
     this.setState({
       history,
       periods
@@ -53,7 +53,8 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     await Persister.saveDaysInfoState(periods, history);
   }
 
-  setPredictions = (periods: WeatherPeriod[], history: WeatherPeriod[]) => {
+  private static _setPredictions = (periods: WeatherPeriod[],
+                                    history: WeatherPeriod[]): void => {
     if (periods.length > 0) {
       for (let p of periods) {
         p.setPredictedGoodness(history);
@@ -64,7 +65,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
   onFetchData = async (location: Location, history: WeatherPeriod[]) => {
     let {periods, city} = await Fetcher.getSome(location);
     Historian.syncTodayLikeWithHistory(periods, history);
-    this.setPredictions(periods, history);
+    GlobalContextProvider._setPredictions(periods, history);
     this.setState({
       location,
       periods,
@@ -110,12 +111,20 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     });
   }
 
-  onChangeRain = (which: string) => {
-    let {currCriteria} = this.state;
-    currCriteria.onToggleRain(which);
+  onChangeRain = (which: string): void => {
+    this.state.currCriteria
+      .onToggleRain(which, (cc: Criteria) => this.setState({
+      currCriteria: cc,
+    }));
+  }
+
+  onHistoryRowPressed = async (item: WeatherPeriod): Promise<void> => {
+    item.likedStatus = -item.likedStatus;
+    let {history, periods} = this.state;
     this.setState({
-      currCriteria,
+      history
     })
+    GlobalContextProvider._setPredictions(periods, history);
   }
 
   onThumbButtonPress = async (which: LikeStatus): Promise<void> => {
@@ -124,7 +133,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     const fst = periods[0];
     fst.changeLikeStatus(which);
     history = Historian.onLikeAdjustHistory(fst, history);
-    this.setPredictions(periods, history);
+    GlobalContextProvider._setPredictions(periods, history);
     this.setState({
       history,
       periods
@@ -152,7 +161,8 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
         delCriteria: this.onDelCriteria,
         appInit: this.onAppInit,
         onThumbButtonPress: this.onThumbButtonPress,
-        onDummyHistoryPressed: this.adjustDummyHistory
+        onDummyHistoryPressed: this.onDummyHistoryPressed,
+        onHistoryRowPressed: this.onHistoryRowPressed
       }
     }
   }

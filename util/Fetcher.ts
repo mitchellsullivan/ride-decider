@@ -19,7 +19,7 @@ export default class Fetcher {
   }
 
   public static async findMe(errCb: Function): Promise<Location> {
-    let location = null;
+    let location = DEFAULT_LOC;
     try {
       location = await GetLocation.getCurrentPosition({
         enableHighAccuracy: false,

@@ -22,10 +22,9 @@ export class WeatherPeriod {
   public get isDaytime(): boolean { return this.pData.isDaytime}
   public get name(): string { return this.realName };
   public get realName(): string {
-    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    console.log(this.date);
+    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday',
+      'Thursday', 'Friday', 'Saturday'];
     let d = new Date(this.date).getUTCDay();
-    console.log(d);
     return days[d];
   }
   public get isTomorrow(): boolean {
@@ -69,11 +68,11 @@ export class WeatherPeriod {
     this.likedStatus = pData.likedStatus;
   }
 
-  getDisplayString() {
+  public get displayString() {
     return `${this.date} ${this.name}, ${this.temp}\u00B0${this.tempUnit}, ` +
       `${this.loWind}` +
       `${this.hiWind === this.loWind ? '' : ' to ' + this.hiWind}` +
-      ` mph\n${this.shortForecast}`;
+      ` mph\n${this.xtrashortfc}`;
   }
 
   public setPredictedGoodness(history: WeatherPeriod[]) {
@@ -93,9 +92,5 @@ export class WeatherPeriod {
     } else {
       this.likedStatus = whichPressed;
     }
-  }
-
-  public get forHistory(): any {
-    return {}
   }
 }

@@ -139,5 +139,4 @@ const ss = StyleSheet.create({
   },
 })
 
-
 export default withGlobalContext(CriteriaScreen);

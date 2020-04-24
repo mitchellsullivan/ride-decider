@@ -33,28 +33,23 @@ class DebugScreen extends Component<any> {
   }
 
   renderContent = () => {
-    let {city, onDummyHistoryPressed} = this.props.global;
+    let {city, onDummyHistoryPressed, location} = this.props.global;
     let {dummyHistoryOn} = this.state;
     return (
       <View style={[ss.emptyListContainer, {alignItems: 'center'}]}>
         <View style={{height: 15}}/>
         <Text style={{color: 'white'}}>Your Location: {city}</Text>
-        <View style={{height: 50}}/>
-        <TouchableHighlight style={{
-          borderWidth: 0.25,
-          borderColor: 'gray',
-          borderRadius: 10,
-          marginLeft: 5,
-          height: 50,
-          width: 200,
-          justifyContent: 'center',
-          alignItems: 'center'
-        }} onPress={async () => {
-          await onDummyHistoryPressed(dummyHistoryOn);
-          this.setState({
-            dummyHistoryOn: !dummyHistoryOn
-          })
-        }} underlayColor={'gray'}>
+        <View style={{height: 15}}/>
+        <Text style={{color: 'white'}}>
+          Your Coordinates: {location ? `${location.latitude}, ${location.longitude}` : '?, ?'}
+        </Text>
+        <View style={{height: 40}}/>
+          <TouchableHighlight style={ss.dummyButton} onPress={async () => {
+            await onDummyHistoryPressed(dummyHistoryOn);
+            this.setState({
+              dummyHistoryOn: !dummyHistoryOn
+            })
+          }} underlayColor={'gray'}>
           <Text style={ss.noDaysText}>{dummyHistoryOn ?
             'Remove Dummy History' : 'Add Dummy History'}
           </Text>
@@ -87,6 +82,16 @@ const ss = StyleSheet.create({
     fontSize: 16,
     color: 'white',
     paddingTop: 0
+  },
+  dummyButton: {
+    borderWidth: 0.25,
+    borderColor: 'gray',
+    borderRadius: 10,
+    marginLeft: 5,
+    height: 50,
+    width: 210,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 

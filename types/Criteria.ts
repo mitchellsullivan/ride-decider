@@ -80,7 +80,7 @@ export class Criteria {
     cb(this);
   }
 
-  public onToggleRain(which: string) {
+  public onToggleRain(which: string, cb: Function) {
     if (which === 'curr') {
       this.rainOkay = !this.rainOkay;
       if (this.rainOkay) this.prevDayRainOkay = true;
@@ -88,6 +88,7 @@ export class Criteria {
     if (which === 'prev') {
       this.prevDayRainOkay = !this.prevDayRainOkay;
     }
+    cb(this);
   }
 
   public onTextInput(t: string, which: string, cb: Function) {

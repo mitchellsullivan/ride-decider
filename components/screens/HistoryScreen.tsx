@@ -28,7 +28,7 @@ class StatusScreen extends Component<any> {
   }
 
   renderList = () => {
-    let {history} = this.props.global;
+    let {history, onHistoryRowPressed} = this.props.global;
     let isEmpty = !history || history.length == 0;
     return isEmpty ? (
         <Text style={ss.noData}>(No history yet.)</Text>
@@ -38,7 +38,8 @@ class StatusScreen extends Component<any> {
           data={history}
           renderItem={({item, index}) =>
             <HistoryRow item={item}
-                        index={index}/>}
+                        index={index}
+                        onPressed={onHistoryRowPressed}/>}
           keyExtractor={(item, idx) => item.name + idx + item.abbr}
         />
 
