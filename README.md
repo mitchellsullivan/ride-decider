@@ -77,8 +77,7 @@ The state of the app will be saved, other than the sample history's being turned
 
 SCREENS
 
-[screen_home](https://github.com/mitchellsullivan/ride-decide/master/raw/readme/screen_home.png "Home Screen")
-[screen_whitelist](https://github.com/mitchellsullivan/ride-decide/master/raw/readme/screen_whitelist.png "Whitelist Screen")
-[screen_history](https://github.com/mitchellsullivan/ride-decide/master/raw/readme/screen_history.png "History Screen")
-[screen_debug](https://github.com/mitchellsullivan/ride-decide/master/raw/readme/screen_debug.png "Debug Screen")
+|   |   |   |   |
+|---|---|---|---|
+|<img src="https://raw.githubusercontent.com/mitchellsullivan/ride-decide/master/readme/screen_home.png" width="200"/> | <img src="https://raw.githubusercontent.com/mitchellsullivan/ride-decide/master/readme/screen_whitelist.png" width="200"/> | <img src="https://raw.githubusercontent.com/mitchellsullivan/ride-decide/master/readme/screen_history.png" width="200"/> | <img src="https://raw.githubusercontent.com/mitchellsullivan/ride-decide/master/readme/screen_debug.png" width="200"/> |
 
