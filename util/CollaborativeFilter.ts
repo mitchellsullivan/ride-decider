@@ -1,25 +1,13 @@
-import {WeatherPeriod} from "../Components/models";
 import {Recommender} from "./rater/Recommender";
+import {CondFunc, WeatherPeriod, PredictedRatings} from '../types'
 
 export const CLEAR = ['skc', 'few', 'sct', 'wind_skc', 'wind_few', 'wind_sct']
 export const PARTLY = ['few', 'sct', 'bkn', 'wind_few', 'wind_sct', 'wind_bkn']
 export const CLOUDY = ['bkn', 'ovc', 'sct', 'wind_sct', 'wind_bkn', 'wind_ovc', 'fog', 'haze']
 export const ALL = [...CLEAR, ...PARTLY, ...CLOUDY]
 
-export class PredictedRatings {
-  constructor(public tempRating: number = 0.5,
-              public skyRating: number = 0.5,
-              public windRating: number = 0.5) {
-  }
 
-  public get tempRatingStr() { return this.tempRating.toFixed(2)}
-  public get skyRatingStr() { return this.skyRating.toFixed(2)}
-  public get windRatingStr() { return this.windRating.toFixed(2)}
-}
-
-type CondFunc = (_:WeatherPeriod) => boolean
-
-export class CollaborativeFilter {
+export default class CollaborativeFilter {
   public static tempConds: CondFunc[] = [
     ({temp}) => temp >= 92,
     ({temp}) => 80 <= temp && temp <= 93,
@@ -65,7 +53,6 @@ export class CollaborativeFilter {
 
   private static _getMtxVal(c: CondFunc, day: WeatherPeriod): number {
     if (c(day)) {
-      // console.log(day);
       if (day.likedStatus == -1) {
         return 1;
       } else if (day.likedStatus == 0) {
@@ -87,7 +74,6 @@ export class CollaborativeFilter {
   private static _getRatingHistoryMtx(prevDays: WeatherPeriod[]): number[][] {
     let res = [];
     for (let prevDay of prevDays) {
-      // console.log(prevDay);
       let trow = this.tempConds.map(c => this._getMtxVal(c, prevDay));
       let srow = this.skyConds.map(c => this._getMtxVal(c, prevDay));
       let wrow = this.windConds.map(c => this._getMtxVal(c, prevDay))
@@ -131,11 +117,11 @@ export class CollaborativeFilter {
     mtx[h - 1].forEach((v:number, i:number) => {
       if (v == 0) {
         scores[i] = Recommender.getRatingPrediction(mtx, h - 1, i);
-        console.log('scored', i, scores[i]);
+        // console.log('scored', i, scores[i]);
       }
     })
 
-    // let lastRow =
+    // lastRow =
     mtx.pop();
     return this._avgScoresByCategory(scores);
   }

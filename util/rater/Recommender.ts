@@ -1,5 +1,4 @@
-import React from 'react';
-import {RatingUtils} from "./RatingUtils";
+import {MatrixUtils} from "./MatrixUtils";
 
 class MyPair<K, V> {
     constructor(public first: K,
@@ -34,9 +33,9 @@ export class Recommender {
     public static getGlobalBaselineRatingPrediction(ratings: Array<Array<number>>,
                                                     rowIndex: number,
                                                     colIndex: number) {
-        let meanRating = RatingUtils.getMean(ratings);
-        let userMeanRating = RatingUtils.getRowMean(ratings[rowIndex]);
-        let itemMeanRating = RatingUtils.getColMean(ratings, colIndex);
+        let meanRating = MatrixUtils.getMean(ratings);
+        let userMeanRating = MatrixUtils.getRowMean(ratings[rowIndex]);
+        let itemMeanRating = MatrixUtils.getColMean(ratings, colIndex);
 
         let result = Math.abs(meanRating + (itemMeanRating - meanRating) + (userMeanRating - meanRating));
         if (isNaN((result))) return 0;
@@ -50,7 +49,7 @@ export class Recommender {
         originalRatings: Array<Array<number>>
     ): Array<MyPair<number, number>> {
         // console.log(JSON.stringify(ratings));
-        let normA: number = RatingUtils.normalizeVector(ratings[rowIndex]);
+        let normA: number = MatrixUtils.normalizeVector(ratings[rowIndex]);
         let similarities: Array<MyPair<number, number>> =
             this.getSimilarities(ratings, normA, rowIndex, colIndex, originalRatings);
         similarities.sort((a, b) =>
@@ -64,7 +63,7 @@ export class Recommender {
         originalRatings: Array<Array<number>>
     ): Array<MyPair<number, number>> {
         // console.log(JSON.stringify(ratings));
-        let normA: number = RatingUtils.normalizeVector(ratings[rowIndex]);
+        let normA: number = MatrixUtils.normalizeVector(ratings[rowIndex]);
         let similarities: Array<MyPair<number, number>> =
             this.getSimilaritiesTop(ratings, normA, rowIndex, originalRatings);
         similarities.sort((a, b) =>
@@ -85,12 +84,12 @@ export class Recommender {
             if (i == rowIndex) continue;
             if (originalRatings[i][colIndex] != 0) {
                 let dotProduct: number =
-                    RatingUtils.calculateDotProduct(originalRatings[rowIndex], originalRatings[i]);
+                    MatrixUtils.calculateDotProduct(originalRatings[rowIndex], originalRatings[i]);
                 let subtractedRawMeanVector: Array<number> =
-                    RatingUtils.getSubtractRawMeanFromVector(ratings[i]);
-                let normB: number = RatingUtils.normalizeVector(subtractedRawMeanVector);
+                    MatrixUtils.getSubtractRawMeanFromVector(ratings[i]);
+                let normB: number = MatrixUtils.normalizeVector(subtractedRawMeanVector);
                 let cosineSimilarity: number =
-                    RatingUtils.calculateCosineSimilarity(dotProduct, normA, normB);
+                    MatrixUtils.calculateCosineSimilarity(dotProduct, normA, normB);
                 similarities.push(new MyPair<number, number>(i, cosineSimilarity));
             }
         }
@@ -108,12 +107,12 @@ export class Recommender {
         for (let i = 0; i < ratingsSize; i++) {
             if (i == rowIndex) continue;
             let dotProduct: number =
-                RatingUtils.calculateDotProduct(originalRatings[rowIndex], originalRatings[i]);
+                MatrixUtils.calculateDotProduct(originalRatings[rowIndex], originalRatings[i]);
             let subtractedRawMeanVector: Array<number> =
-                RatingUtils.getSubtractRawMeanFromVector(ratings[i]);
-            let normB: number = RatingUtils.normalizeVector(subtractedRawMeanVector);
+                MatrixUtils.getSubtractRawMeanFromVector(ratings[i]);
+            let normB: number = MatrixUtils.normalizeVector(subtractedRawMeanVector);
             let cosineSimilarity: number =
-                RatingUtils.calculateCosineSimilarity(dotProduct, normA, normB);
+                MatrixUtils.calculateCosineSimilarity(dotProduct, normA, normB);
             similarities.push(new MyPair<number, number>(i, cosineSimilarity));
         }
         return similarities;
@@ -126,7 +125,7 @@ export class Recommender {
         for (let i = 0; i < ratingsSize; i++) {
             originalRatings.push(ratings[i].map(r => r));
             if (i == rowIndex) {
-                RatingUtils.subtractRawMeanFromVector(ratings[rowIndex]);
+                MatrixUtils.subtractRawMeanFromVector(ratings[rowIndex]);
             }
         }
 
