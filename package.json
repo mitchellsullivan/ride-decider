@@ -1,6 +1,6 @@
 {
   "name": "ride-decide",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -9,7 +9,8 @@
     "test": "jest",
     "lint": "eslint .",
     "build:ios": "react-native bundle --entry-file ./index.js --platform ios --bundle-output ios/main.jsbundle --assets-dest ios --dev false",
-    "build:prod": "npm run build:ios && react-native run-ios --device --configuration=Release"
+    "build:iosprod": "npm run build:ios && react-native run-ios --device --configuration=Release",
+    "build:androidapk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/ && rm -rf android/app/src/main/res/drawable-* && rm -rf android/app/src/main/res/raw/* && cd android && ./gradlew assembleRelease && cd .."
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.9.0",
