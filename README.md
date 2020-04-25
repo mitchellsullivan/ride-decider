@@ -1,5 +1,5 @@
 
-# Ride Decide 4Mike2Bike
+# Ride Decide (4Mike2Bike)
 
 ABOUT
 
@@ -29,7 +29,7 @@ It's up for interpretation, so I just display the raw scores.
 
 In the matrix below t0..tn represent an arbitrary, fixed 
 range of temperatures I judged to be "similar", i.e., t0 might be >= 95, t1 85 to 95, t2 75 to 85.
-Sky conditions like clear, partly cloudy, cloudy, precipitation, etc. Wind ranges by what I've
+Sky conditions (s0..sn) like clear, partly cloudy, cloudy, precipitation, etc. Wind ranges (w0..wn) by what I've
 seen displayed in the forecast calm at 0 to 5, breezy at 5 to 15, windy above 15, etc. These 
 could be adjusted manually by a developer for tweaking based on observed usage (temp ranges could be
 made smaller, etc.). I also mark "groups" of these ranges that are similar, such as when one
@@ -48,11 +48,12 @@ d1   |  50 |  1  |  1  | 50 | 50 | 50 | 1  | 50 | 50 | 1   // dislike t1, sn, wn
 -----+-----+-----+-----+----+----+----+----+----+----+----
 d2   |     |     |     |    |    |    |    |    |    |   
 -----+-----+-----+-----+----+----+----+----+----+----+----
-d3   |
+d3   |     |     |     |    |    |    |    |    |    |
 -----+-----+-----+-----+----+----+----+----+----+----+----
 dn   |  0  | 50  | 50  | 50 | 50 |  0 | 50 | 0  | 50 | 50 // setup day0 w/ 0's
-                                                             a char's. Req'd for
-                                                             algorithm. 
+                                                             at characteristics 
+                                                             required 
+                                                           
 ```
 
 HISTORY
