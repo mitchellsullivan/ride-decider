@@ -6,7 +6,6 @@ import GetLocation from 'react-native-get-location';
 
 export default class Fetcher {
   public static async getWeatherData(location: Location) {
-    location = location || DEFAULT_LOC;
     let long = location.longitude.toFixed(1);
     let lat = location.latitude.toFixed(1);
     let url = `https://api.weather.gov/points/${lat},${long}`;
@@ -18,18 +17,6 @@ export default class Fetcher {
     }
   }
 
-  public static async findMe(errCb: Function): Promise<Location> {
-    let location = DEFAULT_LOC;
-    try {
-      location = await GetLocation.getCurrentPosition({
-        enableHighAccuracy: false,
-        timeout: 5000,
-      });
-    } catch ({code, message}) {
-      errCb();
-    }
-    return location;
-  }
 
   public static async getSome(location: Location) {
     let {data, dataFc} = await Fetcher.getWeatherData(location);

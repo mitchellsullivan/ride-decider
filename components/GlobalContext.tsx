@@ -3,14 +3,17 @@ import Fetcher from "../util/Fetcher";
 import Historian from "../util/Historian";
 import Persister from "../util/Persister";
 import SafeArea from "react-native-safe-area";
+// @ts-ignore
+import GetLocation from 'react-native-get-location';
 
 import {
   Criteria,
   LikeStatus,
   WeatherPeriod,
   GlobalState,
-  Location,
+  // Location,
 } from '../types';
+import {DEFAULT_LOC} from "../data";
 
 const GlobalContext = React.createContext({});
 
@@ -36,10 +39,29 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       history
     });
 
-    setTimeout(async () => {
-      let location = await this.requestLocation();
-      await this.onFetchData(location, history);
-    }, 200);
+    // setTimeout(async () => {
+      this.setState({
+        loading: true,
+        location: DEFAULT_LOC
+      });
+
+      let opts = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+      }
+
+      setTimeout(async () => {
+        await GetLocation.getCurrentPosition(opts).then(async (location: any) => {
+          console.log('LOCATION:', location);
+          await this.onFetchData(location, history)
+        }).catch((err: any) => {
+          console.log(err);
+          this.setState({
+            loading: false
+          })
+        })
+      }, 200);
+
   }
 
   onDummyHistoryPressed = async (isDummyHistoryOn: boolean): Promise<void> => {
@@ -62,7 +84,7 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
     }
   }
 
-  onFetchData = async (location: Location, history: WeatherPeriod[]) => {
+  onFetchData = async (location: any, history: WeatherPeriod[]) => {
     let {periods, city} = await Fetcher.getSome(location);
     Historian.syncTodayLikeWithHistory(periods, history);
     GlobalContextProvider._setPredictions(periods, history);
@@ -97,18 +119,6 @@ export class GlobalContextProvider extends React.Component<any, GlobalState> {
       this.setState({currCriteria})
     }
     await Persister.saveCriteria(criteriaList, currCriteria);
-  }
-
-  requestLocation = async(): Promise<Location> => {
-    this.setState({
-      loading: true,
-      location: {latitude: 0, longitude: 0}
-    });
-    return await Fetcher.findMe(() => {
-      this.setState({
-        loading: false
-      })
-    });
   }
 
   onChangeRain = (which: string): void => {
